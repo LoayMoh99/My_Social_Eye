@@ -60,4 +60,7 @@ while success:
     success, img = cap.read()
     counter+=1
     
+    # find probabilities (speaker,non-speaker):
+    
+    
 cap.release
