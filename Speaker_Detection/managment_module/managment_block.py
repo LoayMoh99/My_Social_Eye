@@ -1,8 +1,10 @@
 import random
 import numpy as np
+import pyttsx3
+
 
 '''
-##  Managment and Sceduling Module:
+##  Managment Module:
 
     This module is responsible for managing when to say the next emotion and match each speaker with his emotion.
     
@@ -55,6 +57,8 @@ def managment_block(faceEmotions, speechProb):
 
 
 if __name__ == '__main__':
+    # start the text-to-speech engine:
+    engine = pyttsx3.init()
     emotions = ['happy', 'sad', 'angry', 'neutral', 'surprised']
 
     # let's say that we detected 2 faces
@@ -74,5 +78,7 @@ if __name__ == '__main__':
         if i == 4:
             faceEmotions = [emotions[4], emotions[1]]
             speechProb = [0.2, 0.91]
-
-        print(managment_block(faceEmotions, speechProb))
+        text = managment_block(faceEmotions, speechProb)
+        print(text)
+        engine.say(text)
+        engine.runAndWait()
