@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (kDebugMode) {
       print('Loading models onStart...');
     }
-    // TODO: load all the ML models
+    // ToDo: load all the ML models
     await Future.delayed(const Duration(seconds: 3)).then((value) {
       setState(() {
         isModelLoded = true;
