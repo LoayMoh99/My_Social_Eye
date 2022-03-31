@@ -5,3 +5,5 @@ dataset_formation/*.mp4
 shape_predictor_68_face_landmarks.dat
 dataset_formation/close_mouth
 dataset_formation/open_mouth
+dataset_formation/close_mouth_test
+dataset_formation/open_mouth_test
