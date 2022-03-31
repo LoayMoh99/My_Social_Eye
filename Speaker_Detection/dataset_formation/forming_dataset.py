@@ -22,9 +22,11 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(predictor_path)
 
 # remove content open/close directories:
-shutil.rmtree("./open_mouth/")
-shutil.rmtree("./close_mouth/")
-
+try:
+    shutil.rmtree("./open_mouth/")
+    shutil.rmtree("./close_mouth/")
+except:
+    pass
 os.mkdir("./open_mouth/")
 os.mkdir("./close_mouth/")
 
