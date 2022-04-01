@@ -52,6 +52,7 @@ THRESHOLD_CLOSE = 1.5
 
 for_test = True
 for i in range(1, DATASET_FOLDERS+1):
+    # TODO: change the dataset source from here after extracting the zip folders to be s1 , s2 , ...
     DataSetDir = "C:\\Collage\\GP\\dataset\\s{i}\\".format(i=i)
     print(DataSetDir)
     for_test = True
