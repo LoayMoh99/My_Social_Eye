@@ -6,7 +6,7 @@ import dlib
 import speaker_managing as spk_mng
 
 
-predictor_path = "C:/Collage/GP/My_Social_Eye/speaker_detection/face_landmarks/shape_predictor_68_face_landmarks.dat"
+predictor_path = "C:/Collage/GP/My_Social_Eye/Speaker_Detection/face_landmarks/shape_predictor_68_face_landmarks.dat"
 
 # load the dlib feature extractor and face detector:
 detector = dlib.get_frontal_face_detector()
