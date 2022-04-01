@@ -13,7 +13,7 @@ import numpy as np
 '''
 
 
-def speaker_managment(mouthOpenNess, N: int = 8) -> str:
+def speaker_managment(mouthOpenNess) -> str:
     # speaking detection will be done by (1st metric):
     # - if the average of the mouth open-ness is greater than 0.25 and less than 0.75 -> speaker
     # - if the average of the mouth open-ness is less than 0.25 -> silent
@@ -37,8 +37,7 @@ def speaker_managment(mouthOpenNess, N: int = 8) -> str:
     # elif avgMouthOpenNess >= 0.75:
     #     return 'Yawn'
 
-    if len(mouthOpenNess) != N:
-        N = len(mouthOpenNess)
+    N = len(mouthOpenNess)
     # get the ratio of open:close frames (2nd metric)
     opened = 0
     for i in range(N):
@@ -58,6 +57,6 @@ if __name__ == '__main__':
     mouthOpenNessSlient = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
     mouthOpenNessYawn = [0.8, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
 
-    print(speaker_managment(mouthOpenNessSpeaker, 8))
-    print(speaker_managment(mouthOpenNessSlient, 8))
-    print(speaker_managment(mouthOpenNessYawn, 8))
+    print(speaker_managment(mouthOpenNessSpeaker))
+    print(speaker_managment(mouthOpenNessSlient))
+    print(speaker_managment(mouthOpenNessYawn))
