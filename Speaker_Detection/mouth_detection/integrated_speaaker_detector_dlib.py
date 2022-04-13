@@ -85,5 +85,6 @@ if __name__ == '__main__':
     '''
     To solve the "very low lips motion" problem:
         -   improve the close mouth dataset ( maybe by increasing dlib distance of lips)
+        -   add more to the dataset -> talk unlabled dataset from galal and label it using dlib
         -   instead of using model -> use feature 3latool ; calc. diff_bet_frames using feature instead of prob.
     '''
