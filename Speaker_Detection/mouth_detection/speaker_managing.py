@@ -38,18 +38,39 @@ def speaker_managment(mouthOpenNess) -> str:
     #     return 'Yawn'
 
     N = len(mouthOpenNess)
+    diff_bet_frames = 0
     # get the ratio of open:close frames (2nd metric)
     opened = 0
+    mouthOpenNessDiscrete = np.zeros((len(mouthOpenNess), 1))
     for i in range(N):
         if mouthOpenNess[i] > 0.5:
             opened += 1
+            mouthOpenNessDiscrete[i] = 1
+        if i == 0:  # skip first value
+            continue
+        # diff_bet_frames += abs(mouthOpenNessDiscrete[i] -
+        #                        mouthOpenNessDiscrete[i-1])
+        diff_bet_frames += abs(mouthOpenNess[i] -
+                               mouthOpenNess[i-1])
     ratio = opened / N
-    if ratio > 0.25 and ratio < 0.75:
-        return 'Speaker'
-    elif ratio <= 0.25:
-        return 'Silent'
-    elif ratio >= 0.75:
-        return 'Yawn'
+
+    print(diff_bet_frames, N)
+    # check if difference between open:close frames is more than 10% no. of frames (3rd metric)
+    if diff_bet_frames > np.floor(0.1 * N):
+        if ratio > 0.25 and ratio < 0.75:
+            return 'Speaker'
+        else:
+            return 'Not Speaker'
+    else:
+        return 'Not Speaker'
+
+    # #2nd metric
+    # if ratio > 0.25 and ratio < 0.75:
+    #     return 'Speaker'
+    # elif ratio <= 0.25:
+    #     return 'Silent'
+    # elif ratio >= 0.75:
+    #     return 'Yawn'
 
 
 if __name__ == '__main__':
