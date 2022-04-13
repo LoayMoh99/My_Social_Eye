@@ -23,6 +23,10 @@ def speaker_managment(mouthOpenNess) -> str:
     # - if the ratio between open:all frames is between 0.25 and 0.75 -> speaker
     # - if the ratio between open:aLL frames is less than 0.25 and nearly equal -> silent
     # - if the ratio between open:aLL frames is greater than 0.75 and nearly equal -> yawn(sleepy)
+    # Another metric (3rd metric):
+    #   calculating the difference between all given frames mouth openness
+    # - if diff. >  10% * num of frames gathered -> speaker
+    # - else -> not speaker
 
     # validation checks:
     if len(mouthOpenNess) == 0:
@@ -54,6 +58,14 @@ def speaker_managment(mouthOpenNess) -> str:
                                mouthOpenNess[i-1])
     ratio = opened / N
 
+    # #2nd metric
+    # if ratio > 0.25 and ratio < 0.75:
+    #     return 'Speaker'
+    # elif ratio <= 0.25:
+    #     return 'Silent'
+    # elif ratio >= 0.75:
+    #     return 'Yawn'
+
     print(diff_bet_frames, N)
     # check if difference between open:close frames is more than 10% no. of frames (3rd metric)
     if diff_bet_frames > np.floor(0.1 * N):
@@ -63,14 +75,6 @@ def speaker_managment(mouthOpenNess) -> str:
             return 'Not Speaker'
     else:
         return 'Not Speaker'
-
-    # #2nd metric
-    # if ratio > 0.25 and ratio < 0.75:
-    #     return 'Speaker'
-    # elif ratio <= 0.25:
-    #     return 'Silent'
-    # elif ratio >= 0.75:
-    #     return 'Yawn'
 
 
 if __name__ == '__main__':
