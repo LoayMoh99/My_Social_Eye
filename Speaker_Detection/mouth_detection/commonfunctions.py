@@ -15,8 +15,9 @@ import math
 from skimage.util import random_noise
 from skimage.filters import median
 from skimage.feature import canny
+from skimage.morphology import closing,square,opening
 
-
+import cv2
 
 # Edges
 from skimage.filters import sobel_h, sobel, sobel_v,roberts, prewitt
