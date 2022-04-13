@@ -8,7 +8,7 @@ import numpy as np
     
     Inputs: list of mouth opne-ness probability of (N frames , i.e N = 8) for specific person face.
                                     
-    Outputs: This person is a speaker / silent / yawn(sleepy)
+    Outputs: This person is a speaker / not speaker {either: silent / yawn(sleepy)}
     
 '''
 
