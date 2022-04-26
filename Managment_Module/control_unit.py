@@ -15,6 +15,10 @@ import pyttsx3
 '''
 
 
+def test_cu(people):
+    return 'control unit called'
+
+
 # helper variables:
 prevSpeakerIndex = -1
 prevSpeakerEmotion = ''

@@ -7,7 +7,8 @@ predictor_path = "C:/Collage/GP/My_Social_Eye/Speaker_Detection/face_landmarks/s
 predictor = dlib.shape_predictor(predictor_path)
 
 
-def feature_extractor(img, face):
+def mouth_feature_extractor(img, face):
+    global predictor
     shape = predictor(img, face)
 
     upper1 = np.asarray([shape.part(61).x, shape.part(61).y])
