@@ -3,7 +3,10 @@ import numpy as np
 import skimage.io as io
 import os
 
-FRAME_COLOR = (255,0,0)
+FRAME_COLOR = (255, 0, 0)
+face_classifier = cv2.CascadeClassifier(
+    'D:\Grad. Project\GP2\Codes\git_repo\Emotions_Detection\Assets\haarcascade_frontalface_default.xml')
+
 
 def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
     '''
@@ -14,16 +17,16 @@ def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
         is_dir: if passed img is a directory,
         is_gray: Boolean(True)
     '''
-    face_classifier = cv2.CascadeClassifier('d:\\Grad. Project\\GP2\\Codes\\repo_emotion\\Emotions_Detection\\Assets\\haarcascade_frontalface_default.xml')
+
     img = io.imread(image) if is_dir else image
-    
+    global face_classifier
     face_list = []
     if not is_gray:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_classifier.detectMultiScale(img,1.1,5)
+    faces = face_classifier.detectMultiScale(img, 1.1, 5)
     for face in faces:
         face_list.append(face)
-    
+
     return face_list
 
 if __name__ == '__main__':      

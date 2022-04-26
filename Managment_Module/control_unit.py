@@ -4,7 +4,7 @@ import pyttsx3
 
 
 '''
-##  Scheduling Module:
+##  Scheduling Module (Intelligent Control Unit):
 
     This module is responsible for managing when to say the next emotion and match each speaker with his emotion.
     
@@ -15,12 +15,16 @@ import pyttsx3
 '''
 
 
+def test_cu(people):
+    return 'control unit called'
+
+
 # helper variables:
 prevSpeakerIndex = -1
 prevSpeakerEmotion = ''
 
 
-def scheduling_block(faceEmotions, speechProb) -> str:
+def control_unit(faceEmotions, speechProb) -> str:
     # text is changed when:
     # 1. the emotion changes for the same speaker (e.g. happy -> sad)
     # 2. the speaker changed (speechProb changes)
@@ -78,7 +82,7 @@ if __name__ == '__main__':
         if i == 4:
             faceEmotions = [emotions[4], emotions[1]]
             speechProb = [0.2, 0.91]
-        text = scheduling_block(faceEmotions, speechProb)
+        text = control_unit(faceEmotions, speechProb)
         print(text)
         engine.say(text)
         engine.runAndWait()
