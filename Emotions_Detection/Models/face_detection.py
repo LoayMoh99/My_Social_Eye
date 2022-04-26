@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import skimage.io as io
+import os
 
 FRAME_COLOR = (255, 0, 0)
 face_classifier = cv2.CascadeClassifier(
@@ -16,6 +17,7 @@ def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
         is_dir: if passed img is a directory,
         is_gray: Boolean(True)
     '''
+
     img = io.imread(image) if is_dir else image
     global face_classifier
     face_list = []
@@ -26,3 +28,6 @@ def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
         face_list.append(face)
 
     return face_list
+
+if __name__ == '__main__':      
+     print(os.getcwd())
