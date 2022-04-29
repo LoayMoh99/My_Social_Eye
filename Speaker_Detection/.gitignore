@@ -10,3 +10,4 @@ mouth_detection/train_open_mouth
 dataset_formation/close_mouth_test
 dataset_formation/open_mouth_test
 dataset_formation/dataset_formation.rar
+__pycache__/
