@@ -1,28 +1,15 @@
 
-from sklearn import preprocessing
 from Emotions_Detection.Models.face_detection import get_faces_from_image
 from Managment_Module.control_unit import test_cu
-from Speaker_Detection.mouth_detection.speaker_managing import speaker_managment
-import numpy as np
+from Managment_Module.face_data_structure import FaceData
 import cv2
 import random
-import dlib
-import pickle
 import sys
 
-from Managment_Module.face_data_structure import FaceData
 sys.path.append('./Managment_Module')
 sys.path.append('./Speaker_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
 sys.path.append('./Emotions_Detection/Models')
-
-
-######################################
-#########     Load Models     ########
-######################################
-# load our mouth open-ness detector model:
-filename = 'Speaker_Detection\mouth_detection\dlib_model.sav'
-mouthStateDetector = pickle.load(open(filename, 'rb'))
 
 
 # load the video:
@@ -66,6 +53,7 @@ def getEmotion(frame, face):
 
 # this will contain the data for N frames
 people = []
+peopleNum = -1
 
 
 def main(isCamera=False, videoName="sleep.mp4"):
@@ -83,11 +71,22 @@ def main(isCamera=False, videoName="sleep.mp4"):
 
     def addToPeople(faceData):
         global people
+        global peopleNum
+        # add people count
+        if peopleNum == -1:
+            peopleNum = len(faceData)
+        else:
+            peopleNum = min(peopleNum, len(faceData))
+
         people.append(faceData)
         print(len(people))
         if len(people) == N:
             # call control unit
-            print(test_cu(people))
+            decision = test_cu(people, peopleNum)
+            if decision[0]:
+                print("we will say the descision: " + decision[1])
+            else:
+                print("we will not say as " + decision[1])
             # remove first F frames
             people = people[F:]
 
@@ -112,6 +111,10 @@ def main(isCamera=False, videoName="sleep.mp4"):
 
                 # detect emotions for each face:
                 faceData.emotion = getEmotion(frame, face)
+
+            # TODO: later make it sorted by face area (closer == first)
+            frameFaceData.append(faceData)
+
         # update people list:
         addToPeople(frameFaceData)
 

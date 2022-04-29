@@ -1,3 +1,9 @@
 venv/
 *.m
 test_*
+__pycache__/
+Speaker_Detection/__pycache__/
+Managment_Module/__pycache__/
+Emotions_Detection/Models/__pycache__/
+Speaker_Detection/mouth_detection/__pycache__/
+Interface/my_social_eye/pubspec.lock
