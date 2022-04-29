@@ -61,7 +61,9 @@ prevPeopleStatus = None
 
 
 def control_unit(people, peopleNum):
-    # TODO complete the documentation and testing! testing -> test: scenarios , AREA_THRESHOLD ,
+    # TODO complete the documentation and testing! 
+    # testing -> test: scenarios , AREA_THRESHOLD , ..
+    
     # text is changed when:
     # 1. the emotion changes for the same speaker (e.g. happy -> sad)
     # 2. the speaker changed (new face position)
@@ -93,6 +95,7 @@ def control_unit(people, peopleNum):
             speakerNum += 1
         peopleStatus.append(status)
     prevPeopleStatus = peopleStatus
+    prevSpeakerNum = speakerNum
 
     # check if text needed to be changed:
     if prevSpeakerNum == speakerNum and speakerNum != 0:
