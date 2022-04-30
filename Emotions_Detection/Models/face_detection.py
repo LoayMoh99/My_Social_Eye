@@ -20,14 +20,11 @@ def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
 
     img = io.imread(image) if is_dir else image
     global face_classifier
-    face_list = []
     if not is_gray:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_classifier.detectMultiScale(img, 1.1, 5)
-    for face in faces:
-        face_list.append(face)
 
-    return face_list
+    return faces
 
 if __name__ == '__main__':      
      print(os.getcwd())
