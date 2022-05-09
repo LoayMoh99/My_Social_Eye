@@ -6,6 +6,8 @@ import cv2
 import random
 import sys
 
+from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
+
 sys.path.append('./Managment_Module')
 sys.path.append('./Speaker_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
@@ -21,7 +23,7 @@ def maskDetector(frame, face):
 
 
 def getMouthState(frame, face):
-    return random.randint(0, 4)
+    return getMouthStateDlib(frame, face)
 
 
 def getEmotion(frame, face):
