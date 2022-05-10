@@ -1,5 +1,6 @@
 
 from Emotions_Detection.Models.face_detection import get_faces_from_image
+from Emotions_Detection.fer_model import getEmotionFER
 from Managment_Module.control_unit import test_cu
 from Managment_Module.face_data_structure import FaceData
 import cv2
@@ -10,6 +11,7 @@ from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDli
 
 sys.path.append('./Managment_Module')
 sys.path.append('./Speaker_Detection')
+sys.path.append('./Emotions_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
 sys.path.append('./Emotions_Detection/Models')
 
@@ -27,8 +29,7 @@ def getMouthState(frame, face):
 
 
 def getEmotion(frame, face):
-    emotions = ['happy', 'sad', 'angry', 'neutral', 'surprised']
-    return emotions[random.randint(0, 4)]
+    return getEmotionFER(frame, face)
 
 
 '''
@@ -58,7 +59,7 @@ people = []
 peopleNum = -1
 
 
-def main(isCamera=False, videoName="sleep.mp4"):
+def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
     # extract frames from video / camera
     cap = None
     if isCamera:
@@ -81,7 +82,6 @@ def main(isCamera=False, videoName="sleep.mp4"):
             peopleNum = min(peopleNum, len(faceData))
 
         people.append(faceData)
-        print(len(people))
         if len(people) == N:
             # call control unit
             decision = test_cu(people, peopleNum)
@@ -110,9 +110,11 @@ def main(isCamera=False, videoName="sleep.mp4"):
             if not faceData.isMasked:
                 # detect mouth state for each face:
                 faceData.mouthState = getMouthState(frame, face)
+                print("Mouth Lips Distance:", faceData.mouthState)
 
                 # detect emotions for each face:
                 faceData.emotion = getEmotion(frame, face)
+                print("Emotion:", faceData.emotion)
 
             # TODO: later make it sorted by face area (closer == first)
             frameFaceData.append(faceData)
@@ -128,4 +130,4 @@ def main(isCamera=False, videoName="sleep.mp4"):
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')
 
-    main(isCamera=False, videoName=TestDir+"sleep.mp4")
+    main(isCamera=False, videoName=TestDir+"speaking.mp4")

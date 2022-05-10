@@ -12,7 +12,7 @@ predictor = dlib.shape_predictor(predictor_path)
 def getMouthStateDlib(frame, face):
     # convert face to a dlib rectangle:
     dlib_rect = dlib.rectangle(
-        left=face.left, top=face.top, right=face.right, bottom=face.bottom)
+        face[0], face[1], face[0]+face[2], face[1]+face[3])
     shape = predictor(frame, dlib_rect)
 
     upper1 = np.asarray([shape.part(61).x, shape.part(61).y])
