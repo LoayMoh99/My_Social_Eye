@@ -1,13 +1,16 @@
 
+from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
 from Emotions_Detection.Models.face_detection import get_faces_from_image
 from Emotions_Detection.fer_model import getEmotionFER
+from Emotions_Detection.main import EmotionDetectionModel
+from Managment_Module.control_unit import control_unit
 from Managment_Module.control_unit import test_cu
 from Managment_Module.face_data_structure import FaceData
 import cv2
 import random
 import sys
-
-from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
+import warnings
+warnings.filterwarnings('ignore')
 
 sys.path.append('./Managment_Module')
 sys.path.append('./Speaker_Detection')
@@ -29,7 +32,14 @@ def getMouthState(frame, face):
 
 
 def getEmotion(frame, face):
-    return getEmotionFER(frame, face)
+    emotions = {'happy': 0.0, 'angry': 0.0,
+                'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+    emotionModel = EmotionDetectionModel(is_prob=False)
+    emotionStr = emotionModel.get_labels(frame, face)
+    #print('Detected Emotion:', emotionStr)
+    emotions[emotionStr] = 1.0
+    return emotions
+    # return getEmotionFER(frame, face)
 
 
 '''
@@ -57,6 +67,8 @@ def getEmotion(frame, face):
 # this will contain the data for N frames
 people = []
 peopleNum = -1
+APPROVED_AREA = 100
+numToCallCU = 0
 
 
 def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
@@ -68,33 +80,43 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
         cap = cv2.VideoCapture(videoName)
     success, frame = cap.read()
 
-    F = 5  # frames per second
+    F = 10  # frames per second
     S = 4  # seconds
     N = S * F  # number of frames
 
-    def addToPeople(faceData):
+    def addToPeople(faceDataList):
         global people
         global peopleNum
+        global numToCallCU
         # add people count
         if peopleNum == -1:
-            peopleNum = len(faceData)
+            peopleNum = len(faceDataList)
         else:
-            peopleNum = min(peopleNum, len(faceData))
-
-        people.append(faceData)
-        if len(people) == N:
+            peopleNum = min(peopleNum, len(faceDataList))
+        numToCallCU += 1
+        if len(faceDataList) > 0:
+            people.append(faceDataList)
+        if numToCallCU == N:
             # call control unit
-            decision = test_cu(people, peopleNum)
+            #decision = test_cu(people, peopleNum)
+            decision = control_unit(people, peopleNum)
+            print(decision)
             if decision[0]:
                 print("we will say the descision: " + decision[1])
-            else:
-                print("we will not say as " + decision[1])
+            # else:
+            #     print("we will not say as " + decision[1])
             # remove first F frames
             people = people[F:]
+            numToCallCU -= F
 
-    while success:
-        # preprocess frame:
-        #print("preprocessing frame if any")
+    while cap.isOpened():
+        if not success:
+            # If loading a video, Use 'break instead of 'continue
+            if isCamera:
+                continue
+            else:
+                break
+        # each model preprocess the frame as needed
 
         # detect faces in the image frame:
         faces = get_faces_from_image(frame, is_dir=False, is_gray=False)
@@ -102,32 +124,38 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
         # create a list of FaceData objects:
         frameFaceData = []
         for face in faces:
-            faceData = FaceData()
+            faceData = FaceData(face)
 
             # detect mask state for each face:
             faceData.isMasked = maskDetector(frame, face)
 
             if not faceData.isMasked:
+                # TODO: to be parallelized on different process/threads
+
                 # detect mouth state for each face:
                 faceData.mouthState = getMouthState(frame, face)
-                print("Mouth Lips Distance:", faceData.mouthState)
+                #print("Mouth Lips Distance:", faceData.mouthState)
 
                 # detect emotions for each face:
                 faceData.emotion = getEmotion(frame, face)
-                print("Emotion:", faceData.emotion)
+                #print("Emotion:", faceData.emotion)
 
-            # TODO: later make it sorted by face area (closer == first)
-            frameFaceData.append(faceData)
+            # check if the face area is above a certain threshold
+            if face[2] > APPROVED_AREA:  # APPROVED_AREA = 100 initially
+                frameFaceData.append(faceData)
+                frameFaceData = sorted(
+                    frameFaceData, key=lambda x: x.face_area, reverse=True)
 
         # update people list:
         addToPeople(frameFaceData)
 
         success, frame = cap.read()
-
+        if cv2.waitKey(5) & 0XFF == 27:
+            break
     cap.release()
 
 
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')
 
-    main(isCamera=False, videoName=TestDir+"speaking.mp4")
+    main(isCamera=True, videoName=TestDir+"speaking.mp4")

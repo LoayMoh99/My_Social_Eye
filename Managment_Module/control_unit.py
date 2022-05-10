@@ -38,13 +38,19 @@ def getPersonStatus(person, N):
             maskedFrames += 1
         else:
             mouthStates.append(frame.mouthState)
-            emotions[frame.emotion] = emotions.get(frame.emotion, 0) + 1
+            #### emotions[frame.emotion] = emotions.get(frame.emotion, 0) + 1
+            # add emotions to the dictionary
+            for key, value in frame.emotion.items():
+                if key in emotions:
+                    emotions[key] += value
+                else:
+                    emotions[key] = value
     # check if masked for almost of the frames
     if maskedFrames > N/2:
         return ('masked', None)
 
     # check if the person is speaking:
-    speakingStatus = speaker_managment(person)
+    speakingStatus = speaker_managment(mouthStates)
     emotion = max(emotions, key=emotions.get)
 
     return (speakingStatus, emotion)
@@ -52,7 +58,7 @@ def getPersonStatus(person, N):
 
 def samePerson(person, prevPerson):
     # TODO make the check not only for the area ; it should compare the x,y cooardinates also
-    return np.abs(person.face_area - prevPerson.face_area) < AREA_THRESHOLD
+    return np.abs(person[0].face_area - prevPerson[0].face_area) < AREA_THRESHOLD
 
     # helper variables:
 prevSpeakerNum = -1
@@ -62,7 +68,7 @@ prevPeopleStatus = None
 
 def control_unit(people, peopleNum):
     # TODO complete the documentation and testing!
-    # testing -> test: scenarios , AREA_THRESHOLD , ..
+    # testing -> test: scenarios (v.v.imp -> will take some time), try AREA_THRESHOLD , ..
 
     # text is changed when:
     # 1. the emotion changes for the same speaker (e.g. happy -> sad)
@@ -89,8 +95,9 @@ def control_unit(people, peopleNum):
 
     # get the status of each person (speaking / not speaking / masked) with emotions:
     peopleStatus = []
-    for person in people:
+    for person in people:  # for each person
         status = getPersonStatus(person, len(person))
+        print(status)
         if status[0] == 'Speaker':
             speakerNum += 1
         peopleStatus.append(status)
@@ -100,6 +107,7 @@ def control_unit(people, peopleNum):
     # check if text needed to be changed:
     if prevSpeakerNum == speakerNum and speakerNum != 0:
         if samePerson(people[0], prevPeople[0]) and prevPeopleStatus[0][0] == peopleStatus[0][0]:
+            print("there is speaker but he is the same")
             return (False, "same person")
         else:
             # say emotion of closest one and speaking i.e. either new emotion for the same speaker
@@ -170,14 +178,21 @@ def speaker_managment(mouthOpenNess) -> str:
     #     return 'Yawn'
 
     N = len(mouthOpenNess)
+    # mouthOpenNess = np.array(mouthOpenNess)
+    # minMouthOpenNess = np.min(mouthOpenNess)
+    # maxMouthOpenNess = np.max(mouthOpenNess)
+    # # min-max normalization
+    # mouthOpenNess = (mouthOpenNess - minMouthOpenNess) / \
+    #     (maxMouthOpenNess - minMouthOpenNess)
+
     diff_bet_frames = 0
     # get the ratio of open:close frames (2nd metric)
     opened = 0
-    mouthOpenNessDiscrete = np.zeros((len(mouthOpenNess), 1))
+    #mouthOpenNessDiscrete = np.zeros((len(mouthOpenNess), 1))
     for i in range(N):
         if mouthOpenNess[i] > 0.5:
             opened += 1
-            mouthOpenNessDiscrete[i] = 1
+            #mouthOpenNessDiscrete[i] = 1
         if i == 0:  # skip first value
             continue
         # diff_bet_frames += abs(mouthOpenNessDiscrete[i] -
@@ -186,15 +201,15 @@ def speaker_managment(mouthOpenNess) -> str:
                                mouthOpenNess[i-1])
     ratio = opened / N
 
-    # #2nd metric
+    # # 2nd metric
     # if ratio > 0.25 and ratio < 0.75:
     #     return 'Speaker'
     # elif ratio <= 0.25:
     #     return 'Silent'
-    # elif ratio >= 0.75:
+    # else:  # if ratio >= 0.75:
     #     return 'Yawn'
 
-    print(diff_bet_frames, N)
+    print(diff_bet_frames, ratio, N)
     # check if difference between open:close frames is more than 10% no. of frames (3rd metric)
     if diff_bet_frames > np.floor(0.1 * N):
         if ratio > 0.25 and ratio < 0.75:
