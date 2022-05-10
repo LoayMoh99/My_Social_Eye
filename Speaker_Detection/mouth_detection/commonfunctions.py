@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from skimage.exposure import histogram
 from matplotlib.pyplot import bar
-from skimage.color import rgb2gray,rgb2hsv
+from skimage.color import rgb2gray,rgb2hsv,rgb2ycbcr
+from skimage.transform import resize
+
 
 # Convolution:
 from scipy.signal import convolve2d
@@ -15,7 +17,7 @@ import math
 from skimage.util import random_noise
 from skimage.filters import median
 from skimage.feature import canny
-from skimage.morphology import closing,square,opening
+from skimage.morphology import closing,square,opening,erosion
 
 import cv2
 
