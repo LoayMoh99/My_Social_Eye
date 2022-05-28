@@ -69,6 +69,7 @@ def getEmotion(frame, face):
 # this will contain the data for N frames
 people = []
 peopleNum = -1
+numToSayNoFace = 0
 APPROVED_AREA = 100
 
 
@@ -88,6 +89,7 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
     def addToPeople(faceDataList):
         global people
         global peopleNum
+        global numToSayNoFace
         # TODO handle this case properly as num sometimes is 0
         # else:
         #     peopleNum = min(peopleNum, len(faceDataList))
@@ -100,6 +102,8 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
                 peopleNum = min(peopleNum, len(faceDataList))
 
             people.append(faceDataList)
+        else:
+            numToSayNoFace += 1
 
         if len(people) == N:
             # call control unit
@@ -108,11 +112,13 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
             print(decision)
             if decision[0]:
                 print("we will say the descision: " + decision[1])
-            # else:
-            #     print("we will not say as " + decision[1])
+            else:
+                print("we will not say as " + decision[1])
             # remove first F frames
             people = people[2*F:]
-
+        elif numToSayNoFace == N:
+            print("No faces are detected")
+            numToSayNoFace = 0
     while cap.isOpened():
         if not success:
             # If loading a video, Use 'break instead of 'continue

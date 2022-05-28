@@ -126,14 +126,11 @@ def control_unit(people, peopleNum):
         peopleStatus.append(pepStatus)
         peopleStatus = sorted(
             peopleStatus, key=lambda x: x[2], reverse=True)
-    print("peopleStatus: ", peopleStatus)
 
     decision = None
     # check if text needed to be changed:
     if prevSpeakerNum == speakerNum and speakerNum != 0:
         if prevPeopleStatus != None and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
-            print(prevPeopleStatus[0][1], peopleStatus[0][1])
-            print('same speaker')
             decision = (False, "same speaker")
         else:
             # say emotion of closest one and speaking i.e. either new emotion for the same speaker
@@ -144,7 +141,6 @@ def control_unit(people, peopleNum):
             if peopleStatus[0][0] == 'masked':
                 decision = (True, "masked")
             if prevPeopleStatus != None and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
-                print('same not speaker')
                 decision = (False, "same not speaker")
             else:  # say emotion of closest one and not speaking
                 decision = (True, peopleStatus[0][1]+" but not speaking")
@@ -155,7 +151,6 @@ def control_unit(people, peopleNum):
             decision = (True, peopleStatus[0][1])
         else:  # both prevSpeakerNum and speakerNum != 0 but different
             if prevPeopleStatus != None and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
-                print('same not speaker')
                 decision = (False, "same not speaker")
             else:  # say emotion of closest one and speaking
                 decision = (True, peopleStatus[0][1])
