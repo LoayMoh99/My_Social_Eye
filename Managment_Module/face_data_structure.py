@@ -1,6 +1,6 @@
 class FaceData:
     def __init__(self, face_position=[], isMasked=None, emotion=None, mouthState=None):
-        self.face_position = face_position
+        self.face_position = face_position  # [x, y, w, h]
         # this is the square root area
         self.face_area = face_position[3] if len(face_position) > 0 else 0
         self.isMasked = isMasked

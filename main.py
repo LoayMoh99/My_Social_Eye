@@ -32,9 +32,11 @@ def getMouthState(frame, face):
 
 
 def getEmotion(frame, face):
+    # TODO : conjvert pred to pred_prob
     emotions = {'happy': 0.0, 'angry': 0.0,
                 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
-    emotionModel = EmotionDetectionModel(is_prob=False)
+    emotionModel = EmotionDetectionModel(
+        model_file='lpq_phog_model_old.sav', is_prob=False, feats='lpq_phog')
     emotionStr = emotionModel.get_labels(frame, face)
     #print('Detected Emotion:', emotionStr)
     emotions[emotionStr] = 1.0
@@ -68,7 +70,6 @@ def getEmotion(frame, face):
 people = []
 peopleNum = -1
 APPROVED_AREA = 100
-numToCallCU = 0
 
 
 def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
@@ -81,22 +82,26 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
     success, frame = cap.read()
 
     F = 10  # frames per second
-    S = 4  # seconds
+    S = 5  # seconds
     N = S * F  # number of frames
 
     def addToPeople(faceDataList):
         global people
         global peopleNum
-        global numToCallCU
+        # TODO handle this case properly as num sometimes is 0
+        # else:
+        #     peopleNum = min(peopleNum, len(faceDataList))
+
         # add people count
-        if peopleNum == -1:
-            peopleNum = len(faceDataList)
-        else:
-            peopleNum = min(peopleNum, len(faceDataList))
-        numToCallCU += 1
         if len(faceDataList) > 0:
+            if peopleNum == -1:
+                peopleNum = len(faceDataList)
+            else:
+                peopleNum = min(peopleNum, len(faceDataList))
+
             people.append(faceDataList)
-        if numToCallCU == N:
+
+        if len(people) == N:
             # call control unit
             #decision = test_cu(people, peopleNum)
             decision = control_unit(people, peopleNum)
@@ -106,8 +111,7 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
             # else:
             #     print("we will not say as " + decision[1])
             # remove first F frames
-            people = people[F:]
-            numToCallCU -= F
+            people = people[2*F:]
 
     while cap.isOpened():
         if not success:
@@ -149,7 +153,9 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
         # update people list:
         addToPeople(frameFaceData)
 
+        cv2.imshow('My Socail Eye', frame)
         success, frame = cap.read()
+        # end with esc
         if cv2.waitKey(5) & 0XFF == 27:
             break
     cap.release()
@@ -158,4 +164,4 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')
 
-    main(isCamera=True, videoName=TestDir+"speaking.mp4")
+    main(isCamera=True, videoName=TestDir+"test1.mp4")

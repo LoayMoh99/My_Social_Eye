@@ -1,0 +1,132 @@
+'''
+This will be the main file for the control unit tests.
+
+It will include all test cases for the control unit module.
+'''
+
+import unittest
+import random
+import control_unit as cu
+from face_data_structure import FaceData
+
+
+class TestControlUnit(unittest.TestCase):
+    F = 10
+    N = 50
+    people = []  # List<List<FaceData>>
+    peopleNum = 2
+
+    emotions = {'happy': 0.0, 'angry': 0.0,
+                'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+    # fill people with data
+    for i in range(N):
+        people.append([])
+        for j in range(peopleNum):
+            face = [random.randint(90, 100), random.randint(
+                90, 100), random.randint(190, 200), random.randint(190, 200)]
+            faceData = FaceData(face)
+            faceData.isMasked = False
+            emotions['happy'] = 1.0
+            faceData.emotion = emotions
+
+            # 50% open and 50% close -> speaking for speaker1(j==0)
+            if j == 0 and i % 2 == 0:
+                faceData.mouthState = 1.0
+            else:
+                faceData.mouthState = 0.0
+
+            people[i].append(faceData)
+
+    def test_cu(self):
+        res = cu.test_cu(None, None)
+        self.assertEqual(res, (True, 'control unit called'))
+
+        # Detect speaker and happy
+        res = cu.control_unit(people=self.people, peopleNum=self.peopleNum)
+        print(res)
+        self.assertEqual(res, (True, 'happy'))
+
+        ###################################################################################
+        # Detect that same speaker with same emotion -> Not saying anything
+        people = self.people[2*self.F:]
+        emotions = self.emotions
+        for i in range(self.N-2*self.F, self.N):
+            people.append([])
+            for j in range(self.peopleNum):
+                face = [random.randint(90, 100), random.randint(
+                    90, 100), random.randint(190, 200), random.randint(190, 200)]
+                faceData = FaceData(face)
+                faceData.isMasked = False
+                emotions['happy'] = 1.0
+                faceData.emotion = emotions
+
+                # 50% open and 50% close -> speaking for speaker1(j==0)
+                if j == 0 and i % 2 == 0:
+                    faceData.mouthState = 1.0
+                else:
+                    faceData.mouthState = 0.0
+
+                people[i].append(faceData)
+
+        res = cu.control_unit(people=people, peopleNum=self.peopleNum)
+        print(res)
+        self.assertEqual(res, (False, 'same speaker'))
+
+        ###################################################################################
+        # Detect that same speaker but with diff emotion -> say new emotion
+        people = self.people[2*self.F:]
+        emotions = self.emotions
+        for i in range(self.N-2*self.F, self.N):
+            people.append([])
+            for j in range(self.peopleNum):
+                face = [random.randint(90, 100), random.randint(
+                    90, 100), random.randint(190, 200), random.randint(190, 200)]
+                faceData = FaceData(face)
+                faceData.isMasked = False
+                emotions['happy'] = 0.0
+                emotions['sad'] = 1.0
+                faceData.emotion = emotions
+
+                # 50% open and 50% close -> speaking for speaker1(j==0)
+                if j == 0 and i % 2 == 0:
+                    faceData.mouthState = 1.0
+                else:
+                    faceData.mouthState = 0.0
+
+                people[i].append(faceData)
+
+        res = cu.control_unit(people=people, peopleNum=self.peopleNum)
+        print(res)
+        self.assertEqual(res, (True, 'sad'))
+
+        ###################################################################################
+        # Detect that diff speaker -> say the emotion of that new speaker
+        people = []
+        emotions = self.emotions
+        for i in range(0, self.N):
+            people.append([])
+            for j in range(self.peopleNum):
+                face = [j*100+random.randint(90, 100), j*100+random.randint(
+                    90, 100), random.randint(190, 200), random.randint(190, 200)]
+                faceData = FaceData(face)
+                faceData.isMasked = False
+                emotions['happy'] = 0.0
+                emotions['sad'] = 1.0
+                faceData.emotion = emotions
+
+                # 50% open and 50% close -> speaking for speaker1(j==0)
+                if j == 1 and i % 2 == 0:
+                    faceData.mouthState = 1.0
+                else:
+                    faceData.mouthState = 0.0
+
+                people[i].append(faceData)
+
+        # Detect that same speaker but with diff emotion -> say new emotion
+        res = cu.control_unit(people=people, peopleNum=self.peopleNum)
+        print(res)
+        self.assertEqual(res, (True, 'sad'))
+
+
+if __name__ == '__main__':
+    unittest.main()

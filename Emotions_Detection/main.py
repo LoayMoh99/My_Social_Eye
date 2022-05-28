@@ -40,7 +40,7 @@ class EmotionDetectionModel:
             face = img[y:y+h, x:x+w]
             face_gray = rgb2gray(img)
             lpq_desc = None
-            phog_desc = None
+            features = []
 
             if 'lpq' in self.feats:
                 # get LPQ Feature
@@ -71,22 +71,23 @@ class EmotionDetectionModel:
             # plt.imshow(img, cmap='gray')
             # plt.show()
             face_gray = self.process_image(face_gray)
-            lpq_desc = None
+            features = []
             phog_desc = None
 
             if 'lpq' in self.feats:
                 # get LPQ Feature
-                lpq_desc = self.lpq.compute(face_gray)
+                features = self.lpq.compute(face_gray)
 
             if 'phog' in self.feats:
                 # get PHOG Feature
                 phog_desc = PHOG_Algorithm(face_gray)
+                features = np.concatenate((features, phog_desc))
 
-            if self.feats == 'lpq_phog':
-                # concatenate the two features
-                features = np.concatenate((lpq_desc, phog_desc))
+            # if self.feats == 'lpq_phog':
+            #     # concatenate the two features
+            #     features = np.concatenate((features, phog_desc))
 
-            # Predict Emotions Propabilities
+            # Predict Emotions String
             pred = self.model.predict([features])
 
             return pred[0]
