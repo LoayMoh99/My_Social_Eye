@@ -5,7 +5,7 @@ import os
 
 FRAME_COLOR = (255, 0, 0)
 face_classifier = cv2.CascadeClassifier(
-    'D:\Grad. Project\GP2\Codes\git_repo\Emotions_Detection\Assets\haarcascade_frontalface_default.xml')
+    'C:\Collage\GP\My_Social_Eye\Emotions_Detection\Assets\haarcascade_frontalface_default.xml')
 
 
 def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
@@ -26,5 +26,6 @@ def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
 
     return faces
 
-if __name__ == '__main__':      
-     print(os.getcwd())
+
+if __name__ == '__main__':
+    print(os.getcwd())

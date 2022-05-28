@@ -1,6 +1,7 @@
 
 import numpy as np
 import dlib
+import pickle
 
 
 predictor_path = "C:/Collage/GP/My_Social_Eye/Speaker_Detection/face_landmarks/shape_predictor_68_face_landmarks.dat"
@@ -8,11 +9,15 @@ predictor_path = "C:/Collage/GP/My_Social_Eye/Speaker_Detection/face_landmarks/s
 # load the dlib feature extractor:
 predictor = dlib.shape_predictor(predictor_path)
 
+# load our mouth open-ness detector model:
+filename = 'C:\Collage\GP\My_Social_Eye\Speaker_Detection\mouth_detection\dlib_model.sav'
+mouthDetectorModel = pickle.load(open(filename, 'rb'))
+
 
 def getMouthStateDlib(frame, face):
     # convert face to a dlib rectangle:
     dlib_rect = dlib.rectangle(
-        left=face.left, top=face.top, right=face.right, bottom=face.bottom)
+        face[0], face[1], face[0]+face[2], face[1]+face[3])
     shape = predictor(frame, dlib_rect)
 
     upper1 = np.asarray([shape.part(61).x, shape.part(61).y])
@@ -25,4 +30,7 @@ def getMouthStateDlib(frame, face):
     feat = (np.linalg.norm(upper1-lower1) +
             np.linalg.norm(upper2-lower2)+np.linalg.norm(upper3-lower3))/3
 
-    return feat
+    sample_feature = np.array([feat]).reshape(-1, 1)
+    sample_pred = mouthDetectorModel.predict_proba(sample_feature)
+
+    return sample_pred[0][1]
