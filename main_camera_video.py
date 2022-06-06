@@ -1,5 +1,4 @@
 
-from tkinter import TRUE
 from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
 from Emotions_Detection.Models.face_detection import get_faces_from_image
 from Emotions_Detection.fer_model import getEmotionFER
@@ -8,8 +7,7 @@ from Managment_Module.control_unit import control_unit
 from Managment_Module.control_unit import test_cu
 from Managment_Module.face_data_structure import FaceData
 import cv2
-import numpy as np
-import pyautogui
+import random
 import sys
 import warnings
 warnings.filterwarnings('ignore')
@@ -75,11 +73,14 @@ numToSayNoFace = 0
 APPROVED_AREA = 100
 
 
-def main():
-    # extract frames from screenshot
-    img = pyautogui.screenshot()
-    # convert these pixels to a proper numpy array to work with OpenCV
-    frame = np.array(img)
+def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
+    # extract frames from video / camera
+    cap = None
+    if isCamera:
+        cap = cv2.VideoCapture(0)
+    else:
+        cap = cv2.VideoCapture(videoName)
+    success, frame = cap.read()
 
     F = 10  # frames per second
     S = 5  # seconds
@@ -118,7 +119,13 @@ def main():
         elif numToSayNoFace == N:
             print("No faces are detected")
             numToSayNoFace = 0
-    while True:
+    while cap.isOpened():
+        if not success:
+            # If loading a video, Use 'break instead of 'continue
+            if isCamera:
+                continue
+            else:
+                break
         # each model preprocess the frame as needed
 
         # detect faces in the image frame:
@@ -152,18 +159,15 @@ def main():
         # update people list:
         addToPeople(frameFaceData)
 
-        # make a screenshot
-        img = pyautogui.screenshot()
-        # convert these pixels to a proper numpy array to work with OpenCV
-        frame = np.array(img)
+        cv2.imshow('My Socail Eye', frame)
+        success, frame = cap.read()
         # end with esc
         if cv2.waitKey(5) & 0XFF == 27:
             break
-    # make sure everything is closed when exited
-    cv2.destroyAllWindows()
+    cap.release()
 
 
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')
 
-    main()
+    main(isCamera=True, videoName=TestDir+"test1.mp4")
