@@ -1,5 +1,5 @@
 
-from tkinter import TRUE
+import pyttsx3
 from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
 from Emotions_Detection.Models.face_detection import get_faces_from_image
 from Emotions_Detection.fer_model import getEmotionFER
@@ -20,6 +20,8 @@ sys.path.append('./Emotions_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
 sys.path.append('./Emotions_Detection/Models')
 
+# start the text-to-speech engine:
+engine = pyttsx3.init()
 
 # load the video:
 TestDir = "C:\\Collage\\GP\\test\\"
@@ -72,7 +74,7 @@ def getEmotion(frame, face):
 people = []
 peopleNum = -1
 numToSayNoFace = 0
-APPROVED_AREA = 100
+APPROVED_AREA = 50
 
 
 def main():
@@ -111,6 +113,7 @@ def main():
             print(decision)
             if decision[0]:
                 print("we will say the descision: " + decision[1])
+                text_to_speech(decision[1])
             else:
                 print("we will not say as " + decision[1])
             # remove first F frames
@@ -163,7 +166,11 @@ def main():
     cv2.destroyAllWindows()
 
 
+def text_to_speech(text):
+    engine.say(text)
+    engine.runAndWait()
+
+
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')
-
     main()
