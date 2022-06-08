@@ -5,6 +5,7 @@ import pyttsx3
 # acceptable difference between the twwo areas of face to be considers same
 AREA_THRESHOLD = 30
 XY_THRES = 30
+TRACKING_THRES = 0.25
 
 '''
 ##  Scheduling Module (Intelligent Control Unit):
@@ -33,14 +34,15 @@ def getPersonStatus(person, N):
     maskedFrames = 0
     mouthStates = []
     emotions = {}
-
+    faceTrackingFeatures = []
     avgArea = 0
     avgPosition = [0, 0]
     for frame in person:
-        # TODO take average for position & area OR ??
+        # take average for position & area
         avgArea += frame.face_area
         avgPosition[0] += frame.face_position[0]
         avgPosition[1] += frame.face_position[1]
+        faceTrackingFeatures.append(frame.face_tracking_feature)
 
         if frame.isMasked:
             maskedFrames += 1
@@ -55,25 +57,34 @@ def getPersonStatus(person, N):
                     emotions[key] = value
     # check if masked for almost of the frames
     if maskedFrames > N/2:
-        return ('masked', None)
+        return ['masked', None, 0, [0, 0], None]
 
     # calculate average area and position
     avgArea /= N
     avgPosition[0] /= N
     avgPosition[1] /= N
 
+    # calculate the average faceTrackingFeatures
+    faceTrackingFeatures = np.array(faceTrackingFeatures)
+    avgFaceTrackingFeature = np.mean(faceTrackingFeatures, axis=0)
+
     # check if the person is speaking:
     speakingStatus = speaker_managment(mouthStates)
     emotion = max(emotions, key=emotions.get)
 
-    return [speakingStatus, emotion, avgArea, avgPosition]
+    return [speakingStatus, emotion, avgArea, avgPosition, avgFaceTrackingFeature]
 
 
 def samePerson(person, prevPerson):
     # make the check not only for the area ; it should compare the x,y cooardinates also
+    # check if the face_tracking_feature didn't change much
+    tracking_feat = np.linalg.norm(
+        person[5]-prevPerson[5])*2 / (np.linalg.norm(person[5])+np.linalg.norm(prevPerson[5]))
+
     return (np.abs(person[4][0] - prevPerson[4][0]) < XY_THRES and
             np.abs(person[4][1] - prevPerson[4][1]) < XY_THRES and
-            np.abs(person[3] - prevPerson[3]) < AREA_THRESHOLD)
+            np.abs(person[3] - prevPerson[3]) < AREA_THRESHOLD and
+            tracking_feat < TRACKING_THRES)
 
 
 # helper variables:
@@ -103,7 +114,7 @@ def control_unit(people, peopleNum):
     people = np.array(people)
     people = np.transpose(people)
 
-    # TODO: do we have to check all people or the closest one only?
+    # do we have to check all people or the closest one only?
     # Ans: my answer is currently we only need the closest one but we might need all if we do further analysis
 
     # get the status of each person (speaking / not speaking / masked) with emotions:
@@ -114,7 +125,8 @@ def control_unit(people, peopleNum):
         pepStatus = [status[0], status[1], 0, 0, [0, 0]]
         if status[0] == 'Speaker':
             speakerNum += 1
-            pepStatus[2] = 1000+status[2]
+            # 5000 is just a big number to give speaker a higher priority
+            pepStatus[2] = 5000+status[2]
         elif status[0] == 'Not Speaker':  # not speaker
             pepStatus[2] = +status[2]
         else:
@@ -122,6 +134,7 @@ def control_unit(people, peopleNum):
 
         pepStatus[3] = status[2]  # area
         pepStatus[4] = status[3]  # position
+        pepStatus[5] = status[4]  # tracking_feature
 
         peopleStatus.append(pepStatus)
         peopleStatus = sorted(
