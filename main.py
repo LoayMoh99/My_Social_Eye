@@ -1,9 +1,10 @@
 
-from tkinter import TRUE
+import pyttsx3
 from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
 from Emotions_Detection.Models.face_detection import get_faces_from_image
 from Emotions_Detection.fer_model import getEmotionFER
 from Emotions_Detection.main import EmotionDetectionModel
+from Managment_Module.face_tracking_feature import extractFaceTrackFeature
 from Managment_Module.control_unit import control_unit
 from Managment_Module.control_unit import test_cu
 from Managment_Module.face_data_structure import FaceData
@@ -20,6 +21,8 @@ sys.path.append('./Emotions_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
 sys.path.append('./Emotions_Detection/Models')
 
+# start the text-to-speech engine:
+engine = pyttsx3.init()
 
 # load the video:
 TestDir = "C:\\Collage\\GP\\test\\"
@@ -72,7 +75,7 @@ def getEmotion(frame, face):
 people = []
 peopleNum = -1
 numToSayNoFace = 0
-APPROVED_AREA = 100
+APPROVED_AREA = 50
 
 
 def main():
@@ -89,7 +92,7 @@ def main():
         global people
         global peopleNum
         global numToSayNoFace
-        # TODO handle this case properly as num sometimes is 0
+        # handle this case properly as num sometimes is 0
         # else:
         #     peopleNum = min(peopleNum, len(faceDataList))
 
@@ -111,6 +114,7 @@ def main():
             print(decision)
             if decision[0]:
                 print("we will say the descision: " + decision[1])
+                text_to_speech(decision[1])
             else:
                 print("we will not say as " + decision[1])
             # remove first F frames
@@ -144,7 +148,12 @@ def main():
                 #print("Emotion:", faceData.emotion)
 
             # check if the face area is above a certain threshold
-            if face[2] > APPROVED_AREA:  # APPROVED_AREA = 100 initially
+            if face[2] > APPROVED_AREA:  
+                # get the face tracking feature (LBP)
+                face_img = frame[face[1]:face[1]+face[3], face[0]:face[0]+face[2]]
+                faceData.faceTrackingFeature = extractFaceTrackFeature(face_img)
+
+                #append then re-sort (as if Pri-Queue)
                 frameFaceData.append(faceData)
                 frameFaceData = sorted(
                     frameFaceData, key=lambda x: x.face_area, reverse=True)
@@ -163,7 +172,11 @@ def main():
     cv2.destroyAllWindows()
 
 
+def text_to_speech(text):
+    engine.say(text)
+    engine.runAndWait()
+
+
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')
-
     main()

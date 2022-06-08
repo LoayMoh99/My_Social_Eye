@@ -1,4 +1,5 @@
 
+import pyttsx3
 from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
 from Emotions_Detection.Models.face_detection import get_faces_from_image
 from Emotions_Detection.fer_model import getEmotionFER
@@ -17,7 +18,8 @@ sys.path.append('./Speaker_Detection')
 sys.path.append('./Emotions_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
 sys.path.append('./Emotions_Detection/Models')
-
+# start the text-to-speech engine:
+engine = pyttsx3.init()
 
 # load the video:
 TestDir = "C:\\Collage\\GP\\test\\"
@@ -70,7 +72,7 @@ def getEmotion(frame, face):
 people = []
 peopleNum = -1
 numToSayNoFace = 0
-APPROVED_AREA = 100
+APPROVED_AREA = 50
 
 
 def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
@@ -166,6 +168,10 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
             break
     cap.release()
 
+
+def text_to_speech(text):
+    engine.say(text)
+    engine.runAndWait()
 
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')
