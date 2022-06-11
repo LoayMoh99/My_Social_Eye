@@ -136,6 +136,12 @@ def main():
             # detect mask state for each face:
             faceData.isMasked = maskDetector(frame, face)
 
+            # get the face tracking feature (LBP)
+            face_img = frame[face[1]:face[1] +
+                             face[3], face[0]:face[0]+face[2]]
+            faceData.faceTrackFeature = extractFaceTrackFeature(
+                face_img)
+
             if not faceData.isMasked:
                 # TODO: to be parallelized on different process/threads
 
@@ -148,11 +154,7 @@ def main():
                 #print("Emotion:", faceData.emotion)
 
             # check if the face area is above a certain threshold
-            if face[2] > APPROVED_AREA:  
-                # get the face tracking feature (LBP)
-                face_img = frame[face[1]:face[1]+face[3], face[0]:face[0]+face[2]]
-                faceData.faceTrackingFeature = extractFaceTrackFeature(face_img)
-
+            if face[2] > APPROVED_AREA: 
                 #append then re-sort (as if Pri-Queue)
                 frameFaceData.append(faceData)
                 frameFaceData = sorted(

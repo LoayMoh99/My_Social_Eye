@@ -9,4 +9,4 @@ class FaceData:
         self.faceTrackFeature = faceTrackFeature
 
     def __str__(self):
-        return "FaceData: " + str(self.face_position) + " " + str(self.face_area)+" "+str(self.isMasked) + " " + str(self.emotion) + " " + str(self.mouthState)
+        return "FaceData: " + str(self.face_position) + " " + str(self.face_area)+" "+str(self.isMasked) + " " + str(self.emotion) + " " + str(self.mouthState) + " " + str(self.faceTrackFeature)

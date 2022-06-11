@@ -24,4 +24,4 @@ def extractFaceTrackFeature(face_img):
     face = cv2.cvtColor(face_img, cv2.COLOR_BGR2GRAY)
     # extract LBP feature
     lbp_hist = desc.describe(face)
-    return np.array(lbp_hist)
+    return np.array(lbp_hist[0])
