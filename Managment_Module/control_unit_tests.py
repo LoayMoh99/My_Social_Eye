@@ -6,6 +6,7 @@ It will include all test cases for the control unit module.
 
 import unittest
 import random
+import numpy as np
 import control_unit as cu
 from face_data_structure import FaceData
 
@@ -28,6 +29,8 @@ class TestControlUnit(unittest.TestCase):
             faceData.isMasked = False
             emotions['happy'] = 1.0
             faceData.emotion = emotions
+            faceData.faceTrackFeature = np.array(
+                [47795.0, 25881.0, 20927.0,  5712.0, 24987.0, 17382.0,  4843.0, 23885.0, 21082.0, 42731.0])
 
             # 50% open and 50% close -> speaking for speaker1(j==0)
             if j == 0 and i % 2 == 0:
@@ -59,6 +62,8 @@ class TestControlUnit(unittest.TestCase):
                 faceData.isMasked = False
                 emotions['happy'] = 1.0
                 faceData.emotion = emotions
+                faceData.faceTrackFeature = np.array(
+                    [47795.0, 25881.0, 20927.0,  5712.0, 24987.0, 17382.0,  4843.0, 23885.0, 21082.0, 42731.0])
 
                 # 50% open and 50% close -> speaking for speaker1(j==0)
                 if j == 0 and i % 2 == 0:
@@ -86,6 +91,8 @@ class TestControlUnit(unittest.TestCase):
                 emotions['happy'] = 0.0
                 emotions['sad'] = 1.0
                 faceData.emotion = emotions
+                faceData.faceTrackFeature = np.array(
+                    [47795.0, 25881.0, 20927.0,  5712.0, 24987.0, 17382.0,  4843.0, 23885.0, 21082.0, 42731.0])
 
                 # 50% open and 50% close -> speaking for speaker1(j==0)
                 if j == 0 and i % 2 == 0:
@@ -106,13 +113,16 @@ class TestControlUnit(unittest.TestCase):
         for i in range(0, self.N):
             people.append([])
             for j in range(self.peopleNum):
-                face = [j*100+random.randint(90, 100), j*100+random.randint(
+                face = [random.randint(90, 100), random.randint(
                     90, 100), random.randint(190, 200), random.randint(190, 200)]
                 faceData = FaceData(face)
                 faceData.isMasked = False
                 emotions['happy'] = 0.0
                 emotions['sad'] = 1.0
                 faceData.emotion = emotions
+                # diff in there faceTrack feature
+                faceData.faceTrackFeature = np.array(
+                    [0.0, 0.0, 0.0,  0.0, 0.0, 0.0,  0.0, 0.0, 0.0, 0.0])
 
                 # 50% open and 50% close -> speaking for speaker1(j==0)
                 if j == 1 and i % 2 == 0:
