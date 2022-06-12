@@ -27,6 +27,7 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install pytest
           pip install numpy
+          pip install tensorflow
           pip install -r requirements.txt
       - name: Run integration and unit tests
         run: |
