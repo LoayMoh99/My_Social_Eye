@@ -1,7 +1,6 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: win-64
-_tflow_select=2.3.0=eigen
 absl-py=1.0.0=pyhd8ed1ab_0
 aiohttp=3.8.1=py38h294d835_0
 aiosignal=1.2.0=pyhd8ed1ab_0
