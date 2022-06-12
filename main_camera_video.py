@@ -4,11 +4,11 @@ from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDli
 from Emotions_Detection.Models.face_detection import get_faces_from_image
 from Emotions_Detection.fer_model import getEmotionFER
 from Emotions_Detection.main import EmotionDetectionModel
+from Managment_Module.face_tracking_feature import extractFaceTrackFeature
 from Managment_Module.control_unit import control_unit
 from Managment_Module.control_unit import test_cu
 from Managment_Module.face_data_structure import FaceData
 import cv2
-import random
 import sys
 import warnings
 warnings.filterwarnings('ignore')
@@ -92,7 +92,7 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
         global people
         global peopleNum
         global numToSayNoFace
-        # TODO handle this case properly as num sometimes is 0
+        # handle this case properly as num sometimes is 0
         # else:
         #     peopleNum = min(peopleNum, len(faceDataList))
 
@@ -114,6 +114,7 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
             print(decision)
             if decision[0]:
                 print("we will say the descision: " + decision[1])
+                text_to_speech(decision[1])
             else:
                 print("we will not say as " + decision[1])
             # remove first F frames
@@ -141,8 +142,14 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
             # detect mask state for each face:
             faceData.isMasked = maskDetector(frame, face)
 
+            # get the face tracking feature (LBP)
+            face_img = frame[face[1]:face[1] +
+                             face[3], face[0]:face[0]+face[2]]
+            faceData.faceTrackFeature = extractFaceTrackFeature(
+                face_img)
+
             if not faceData.isMasked:
-                # TODO: to be parallelized on different process/threads
+                #: to be parallelized on different process/threads
 
                 # detect mouth state for each face:
                 faceData.mouthState = getMouthState(frame, face)
@@ -153,7 +160,7 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
                 #print("Emotion:", faceData.emotion)
 
             # check if the face area is above a certain threshold
-            if face[2] > APPROVED_AREA:  # APPROVED_AREA = 100 initially
+            if face[2] > APPROVED_AREA:
                 frameFaceData.append(faceData)
                 frameFaceData = sorted(
                     frameFaceData, key=lambda x: x.face_area, reverse=True)
@@ -166,12 +173,15 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
         # end with esc
         if cv2.waitKey(5) & 0XFF == 27:
             break
+    # make sure everything is closed when exited
+    cv2.destroyAllWindows()
     cap.release()
 
 
 def text_to_speech(text):
     engine.say(text)
     engine.runAndWait()
+
 
 if __name__ == '__main__':
     print('Welcome to "My Social Eye"')

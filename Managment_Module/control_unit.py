@@ -8,19 +8,19 @@ XY_THRES = 30
 TRACKING_THRES = 0.25
 
 '''
-##  Scheduling Module (Intelligent Control Unit):
+# Scheduling Module (Intelligent Control Unit):
 
     This module is responsible for managing when to say the next emotion and match each speaker with his emotion.
-    
+
     Inputs: List<List<FaceData>> people
             | 1st person frame1     2nd person frame1     3rd person frame1    ..
             | 1st person frame2     2nd person frame2     3rd person frame2    ..
             |       :                       :                      :           :
             | 1st person frameN     2nd person frameN     3rd person frameN    ..
-    
+
     Outputs: (Boolean to say text need cahnge or not , Text to be said and sent to text-to-speech module)
             i.e. (True, 'happy') or (False, 'same person')
-    
+
 '''
 
 
@@ -42,13 +42,13 @@ def getPersonStatus(person, N):
         avgArea += frame.face_area
         avgPosition[0] += frame.face_position[0]
         avgPosition[1] += frame.face_position[1]
-        faceTrackingFeatures.append(frame.face_tracking_feature)
+        faceTrackingFeatures.append(frame.faceTrackFeature)
 
         if frame.isMasked:
             maskedFrames += 1
         else:
             mouthStates.append(frame.mouthState)
-            #### emotions[frame.emotion] = emotions.get(frame.emotion, 0) + 1
+            # emotions[frame.emotion] = emotions.get(frame.emotion, 0) + 1
             # add emotions to the dictionary
             for key, value in frame.emotion.items():
                 if key in emotions:
@@ -80,7 +80,6 @@ def samePerson(person, prevPerson):
     # check if the face_tracking_feature didn't change much
     tracking_feat = np.linalg.norm(
         person[5]-prevPerson[5])*2 / (np.linalg.norm(person[5])+np.linalg.norm(prevPerson[5]))
-
     return (np.abs(person[4][0] - prevPerson[4][0]) < XY_THRES and
             np.abs(person[4][1] - prevPerson[4][1]) < XY_THRES and
             np.abs(person[3] - prevPerson[3]) < AREA_THRESHOLD and
@@ -121,8 +120,8 @@ def control_unit(people, peopleNum):
     peopleStatus = []
     for person in people:  # for each person
         status = getPersonStatus(person, len(person))
-        # [speakingStatus, emotion, speakingValue, avgArea, avgPosition]
-        pepStatus = [status[0], status[1], 0, 0, [0, 0]]
+        # [speakingStatus, emotion, speakingValue, avgArea, avgPosition , avgFaceTrackingFeature]
+        pepStatus = [status[0], status[1], 0, status[2], status[3], status[4]]
         if status[0] == 'Speaker':
             speakerNum += 1
             # 5000 is just a big number to give speaker a higher priority
@@ -132,15 +131,12 @@ def control_unit(people, peopleNum):
         else:
             pepStatus[2] = 0
 
-        pepStatus[3] = status[2]  # area
-        pepStatus[4] = status[3]  # position
-        pepStatus[5] = status[4]  # tracking_feature
-
         peopleStatus.append(pepStatus)
         peopleStatus = sorted(
             peopleStatus, key=lambda x: x[2], reverse=True)
 
     decision = None
+    print('speakerNum , peopleNum: ', speakerNum, peopleNum)
     # check if text needed to be changed:
     if prevSpeakerNum == speakerNum and speakerNum != 0:
         if prevPeopleStatus != None and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
@@ -179,14 +175,14 @@ def control_unit(people, peopleNum):
 
 
 '''
-##  Speaker Managing Block:
+# Speaker Managing Block:
 
     This block is responsible for managing if this series of mouth open-ness detected frames of a person is a speaker / silent / yawn(sleepy).
-    
+
     Inputs: list of mouth opne-ness probability of (N frames , i.e N = 8) for specific person face.
-                                    
+
     Outputs: This person is a speaker / not speaker {either: silent / yawn(sleepy)}
-    
+
 '''
 
 
@@ -229,11 +225,11 @@ def speaker_managment(mouthOpenNess) -> str:
     diff_bet_frames = 0
     # get the ratio of open:close frames (2nd metric)
     opened = 0
-    #mouthOpenNessDiscrete = np.zeros((len(mouthOpenNess), 1))
+    # mouthOpenNessDiscrete = np.zeros((len(mouthOpenNess), 1))
     for i in range(N):
         if mouthOpenNess[i] > 0.5:
             opened += 1
-            #mouthOpenNessDiscrete[i] = 1
+            # mouthOpenNessDiscrete[i] = 1
         if i == 0:  # skip first value
             continue
         # diff_bet_frames += abs(mouthOpenNessDiscrete[i] -
@@ -250,7 +246,6 @@ def speaker_managment(mouthOpenNess) -> str:
     # else:  # if ratio >= 0.75:
     #     return 'Yawn'
 
-    print(diff_bet_frames, ratio, N)
     # check if difference between open:close frames is more than 10% no. of frames (3rd metric)
     if diff_bet_frames > np.floor(0.1 * N):
         if ratio > 0.25 and ratio < 0.75:
