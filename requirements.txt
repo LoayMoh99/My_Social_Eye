@@ -113,7 +113,6 @@ pyreadline==2.1
 PyRect==0.2.0
 PyScreeze==0.1.28
 PySocks==1.7.1
-pyspark==3.2.1
 pytest==7.1.2
 python-dateutil==2.8.2
 pyttsx3==2.90
@@ -162,4 +161,3 @@ win-inet-pton==1.1.0
 wincertstore==0.2
 wrapt==1.14.0
 yarl==1.7.2
-zipp==3.7.0

@@ -28,7 +28,7 @@ jobs:
           pip3 install pytest
           pip3 install numpy
           pip3 install tensorflow
-          C:\hostedtoolcache\windows\Python\3.10.5\x64\python.exe -m pip install -r requirements.txt
+          pip3 install -r requirements.txt
       - name: Run integration and unit tests
         run: |
           py.test
