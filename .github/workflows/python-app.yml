@@ -25,6 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pytest
+          pip install numpy
           pip install -r requirements.txt
       - name: Run integration and unit tests
         run: |
