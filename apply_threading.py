@@ -15,11 +15,14 @@ sys.path.append('./Emotions_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
 sys.path.append('./Emotions_Detection/Models')
 
+emotion = None
+mouthState = None
+faceTrack = None
+
 
 def getMouthState(frame, face):
+    global mouthState
     mouthState = getMouthStateDlib(frame, face)
-    print('mouthState:', mouthState)
-    return mouthState
 
 
 def getEmotion(frame, face):
@@ -31,8 +34,8 @@ def getEmotion(frame, face):
     emotionStr = emotionModel.get_labels(frame, face)
     #print('Detected Emotion:', emotionStr)
     emotions[emotionStr] = 1.0
-    print('emotions:', emotions)
-    return emotions
+    global emotion
+    emotion = emotions
     # return getEmotionFER(frame, face)
 
 
@@ -40,28 +43,41 @@ def getFaceTrackFeature(frame, face):
     # get the face tracking feature (LBP)
     face_img = frame[face[1]:face[1] +
                      face[3], face[0]:face[0]+face[2]]
+    global faceTrack
     faceTrack = extractFaceTrackFeature(face_img)
-    return print('faceTrack:', faceTrack)
 
 
 if __name__ == "__main__":
-    frame = cv2.imread('./frame0.jpg')
-    # detect faces in the image frame:
-    faces = get_faces_from_image(frame, is_dir=False, is_gray=False)
-    face = faces[0]
+    cap = cv2.VideoCapture(0)
+    success, frame = cap.read()
 
-    # creating threads
-    t1 = threading.Thread(target=getMouthState, name='t1', args=(frame, face))
-    t2 = threading.Thread(target=getEmotion, name='t2', args=(frame, face))
-    t3 = threading.Thread(target=getFaceTrackFeature,
-                          name='t3', args=(frame, face))
+    while success:
+        # detect faces in the image frame:
+        faces = get_faces_from_image(frame, is_dir=False, is_gray=False)
+        if len(faces) == 0:
+            print('No face detected')
+            continue
+        face = faces[0]
 
-    # starting threads
-    t1.start()
-    t2.start()
-    t3.start()
+        # creating threads
+        t1 = threading.Thread(target=getMouthState,
+                              name='t1', args=(frame, face))
+        t2 = threading.Thread(target=getEmotion, name='t2', args=(frame, face))
+        t3 = threading.Thread(target=getFaceTrackFeature,
+                              name='t3', args=(frame, face))
 
-    # wait until all threads finish
-    t1.join()
-    t2.join()
-    t3.join()
+        # starting threads
+        t1.start()
+        t2.start()
+        t3.start()
+
+        # wait until all threads finish
+        t1.join()
+        t2.join()
+        t3.join()
+
+        print('Mouth State:', mouthState)
+        print('Emotion:', emotion)
+        print('Face Track:', faceTrack)
+
+        success, frame = cap.read()
