@@ -1,13 +1,17 @@
 import pytest
 
+from main_camera_video_thread import main
 
-def test_file1_method1():
-    x = 5
-    y = 6
-    assert x+1 == y, "x+1 should equal y"
+results = main(
+    isCamera=False, videoName="./Speaker_Detection/2.mpg", silent=True)
+print(results)
 
 
-def test_file1_method2():
-    x = 5
-    y = 6
-    assert x+1 == y, "test failed"
+def test1():
+    # at first he was not speaking yet (only mouth open) - Neutral Emotion
+    assert results[0] == (True, 'neutral but not speaking'), "test failed"
+
+
+def test2():
+    # then he was speaking - Neutral Emotion
+    assert results[1] == (True, 'neutral'), "test failed"

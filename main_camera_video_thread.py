@@ -10,6 +10,7 @@ from Managment_Module.control_unit import control_unit
 from Managment_Module.control_unit import test_cu
 from Managment_Module.face_data_structure import FaceData
 import cv2
+import numpy as np
 import sys
 import warnings
 warnings.filterwarnings('ignore')
@@ -93,7 +94,8 @@ numToSayNoFace = 0
 APPROVED_AREA = 50
 
 
-def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
+def main(isCamera=False, videoName=TestDir+"sleep.mp4", silent=False):
+    results = []
     # extract frames from video / camera
     cap = None
     if isCamera:
@@ -129,10 +131,12 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
             # call control unit
             #decision = test_cu(people, peopleNum)
             decision = control_unit(people, peopleNum)
+            results.append(decision)
             print(decision)
             if decision[0]:
                 print("we will say the descision: " + decision[1])
-                text_to_speech(decision[1])
+                if not silent:
+                    text_to_speech(decision[1])
             else:
                 print("we will not say as " + decision[1])
             # remove first F frames
@@ -203,8 +207,8 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
 
         # update people list:
         addToPeople(frameFaceData)
-
-        cv2.imshow('My Socail Eye', frame)
+        if isCamera:
+            cv2.imshow('My Socail Eye', frame)
         success, frame = cap.read()
         # end with esc
         if cv2.waitKey(5) & 0XFF == 27:
@@ -213,10 +217,16 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
     cv2.destroyAllWindows()
     cap.release()
 
+    return results
+
 
 def text_to_speech(text):
     engine.say(text)
     engine.runAndWait()
+
+
+def teeeeeeeeest():
+    print('from main')
 
 
 if __name__ == '__main__':

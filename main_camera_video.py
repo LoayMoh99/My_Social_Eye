@@ -168,7 +168,8 @@ def main(isCamera=False, videoName=TestDir+"sleep.mp4"):
         # update people list:
         addToPeople(frameFaceData)
 
-        cv2.imshow('My Socail Eye', frame)
+        if isCamera:
+            cv2.imshow('My Socail Eye', frame)
         success, frame = cap.read()
         # end with esc
         if cv2.waitKey(5) & 0XFF == 27:

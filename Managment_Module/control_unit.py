@@ -108,9 +108,10 @@ def control_unit(people, peopleNum):
     global prevPeopleStatus
 
     # preprocess people data:
-    for i in range(peopleNum):
+    for i in range(len(people)):
         people[i] = people[i][:peopleNum]
-    people = np.array(people)
+
+    people = np.array(people).reshape(-1, peopleNum)
     people = np.transpose(people)
 
     # do we have to check all people or the closest one only?
