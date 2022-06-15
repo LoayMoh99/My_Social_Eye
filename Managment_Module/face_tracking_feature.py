@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from skimage import feature
+from skimage.feature import local_binary_pattern
 import numpy as np
 import cv2
 
@@ -10,7 +10,7 @@ class LocalBinaryPatterns:
         self.radius = radius
 
     def describe(self, image, eps=1e-7):
-        lbp = feature.local_binary_pattern(image, self.num_points, self.radius)
+        lbp = local_binary_pattern(image, self.num_points, self.radius)
         hist = plt.hist(lbp.ravel())
         return hist
 
