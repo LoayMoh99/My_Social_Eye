@@ -5,7 +5,7 @@ import pyttsx3
 # acceptable difference between the twwo areas of face to be considers same
 AREA_THRESHOLD = 30
 XY_THRES = 30
-TRACKING_THRES = 0.25
+TRACKING_THRES = 0.2
 
 '''
 # Scheduling Module (Intelligent Control Unit):
@@ -80,6 +80,7 @@ def samePerson(person, prevPerson):
     # check if the face_tracking_feature didn't change much
     tracking_feat = np.linalg.norm(
         person[5]-prevPerson[5])*2 / (np.linalg.norm(person[5])+np.linalg.norm(prevPerson[5]))
+    print('tracking_feat', tracking_feat)
     return (np.abs(person[4][0] - prevPerson[4][0]) < XY_THRES and
             np.abs(person[4][1] - prevPerson[4][1]) < XY_THRES and
             np.abs(person[3] - prevPerson[3]) < AREA_THRESHOLD and
