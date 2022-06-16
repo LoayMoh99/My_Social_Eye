@@ -115,9 +115,10 @@ def activateTestingCamera(event):
     print("activated Testing Camera")
     welcomeCamera()
     # open camera in the app
-    ins.config(text="Activated Camera mode to stop press s button")
     # VideoCam(root,label,logo)
-    main_camera_thread_gui(isCamera=True, root=root, label=label, logo=logo)
+    main_camera_thread_gui(isCamera=True, root=root,
+                           label=label, logo=logo, ins=ins)
+    ins.config(text="Activated Camera mode to stop press s button")
     # ending the video cam
     ByeCamera()
 
