@@ -1,8 +1,8 @@
 import pytest
 
-from main_camera_video_thread import main
+from main_camera_video_thread import main_camera_thread
 
-results = main(
+results = main_camera_thread(
     isCamera=False, videoName="./Speaker_Detection/2.mpg", silent=True)
 print(results)
 

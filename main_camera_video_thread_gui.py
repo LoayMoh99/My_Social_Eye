@@ -11,9 +11,12 @@ from Managment_Module.control_unit import test_cu
 from Managment_Module.face_data_structure import FaceData
 import cv2
 import numpy as np
-import pyautogui
 import sys
 import warnings
+# for gui
+from tkinter import *
+from PIL import ImageTk, Image
+import cv2
 import keyboard
 warnings.filterwarnings('ignore')
 
@@ -22,7 +25,6 @@ sys.path.append('./Speaker_Detection')
 sys.path.append('./Emotions_Detection')
 sys.path.append('./Speaker_Detection/mouth_detection')
 sys.path.append('./Emotions_Detection/Models')
-
 # start the text-to-speech engine:
 engine = pyttsx3.init()
 
@@ -97,12 +99,15 @@ numToSayNoFace = 0
 APPROVED_AREA = 50
 
 
-def main_record_thread():
-    # extract frames from screenshot
-    img = pyautogui.screenshot()
-    # convert these pixels to a proper numpy array to work with OpenCV
-    frame = np.array(img)
+def main_camera_thread_gui(isCamera=False, videoName=TestDir+"sleep.mp4", silent=False, root=None, label=None, logo=None):
+    # extract frames from video / camera
+    cap = None
+    if isCamera:
+        cap = cv2.VideoCapture(0)
+    else:
+        cap = cv2.VideoCapture(videoName)
 
+    results = []
     F = 10  # frames per second
     S = 5  # seconds
     N = S * F  # number of frames
@@ -130,10 +135,13 @@ def main_record_thread():
             # call control unit
             #decision = test_cu(people, peopleNum)
             decision = control_unit(people, peopleNum)
+            results.append(decision)
             print(decision)
             if decision[0]:
                 print("we will say the descision: " + decision[1])
-                text_to_speech(decision[1])
+                if not silent:
+                    text_to_speech(decision[1])
+
             else:
                 print("we will not say as " + decision[1])
             # remove first F frames
@@ -141,7 +149,10 @@ def main_record_thread():
         elif numToSayNoFace == N:
             print("No faces are detected")
             numToSayNoFace = 0
+
     while True:
+        frame = cap.read()[1]
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # each model preprocess the frame as needed
 
         # detect faces in the image frame:
@@ -192,7 +203,6 @@ def main_record_thread():
 
             # check if the face area is above a certain threshold
             if face[2] > APPROVED_AREA:
-                # append then re-sort (as if Pri-Queue)
                 frameFaceData.append(faceData)
                 frameFaceData = sorted(
                     frameFaceData, key=lambda x: x.face_area, reverse=True)
@@ -200,23 +210,16 @@ def main_record_thread():
         # update people list:
         addToPeople(frameFaceData)
 
-        # make a screenshot
-        img = pyautogui.screenshot()
-        # convert these pixels to a proper numpy array to work with OpenCV
-        frame = np.array(img)
-        # end with esc
-        if keyboard.is_pressed('q'):
+        # show the frame
+        frame = ImageTk.PhotoImage(Image.fromarray(frame))
+        label.config(image=frame)
+        root.update()
+        # Check if S Button was pressed
+        if keyboard.is_pressed('s'):
+            label.config(image=logo)
             break
-
-    # make sure everything is closed when exited
-    cv2.destroyAllWindows()
 
 
 def text_to_speech(text):
     engine.say(text)
     engine.runAndWait()
-
-
-if __name__ == '__main__':
-    print('Welcome to "My Social Eye"')
-    main_record_thread()
