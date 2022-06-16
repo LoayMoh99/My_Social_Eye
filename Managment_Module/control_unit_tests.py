@@ -40,7 +40,7 @@ class TestControlUnit(unittest.TestCase):
 
             people[i].append(faceData)
 
-    def test_cu(self):
+    def test_cu1(self):
         res = cu.test_cu(None, None)
         self.assertEqual(res, (True, 'control unit called'))
 
@@ -106,6 +106,7 @@ class TestControlUnit(unittest.TestCase):
         print(res)
         self.assertEqual(res, (True, 'sad'))
 
+    def test_cu2(self):
         ###################################################################################
         # Detect that diff speaker -> say the emotion of that new speaker
         people = []
