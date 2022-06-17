@@ -2,7 +2,6 @@
 import pyttsx3
 from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
 from Emotions_Detection.Models.face_detection import get_faces_from_image
-from Emotions_Detection.fer_model import getEmotionFER
 from Emotions_Detection.main import EmotionDetectionModel
 from Managment_Module.face_tracking_feature import extractFaceTrackFeature
 from Managment_Module.control_unit import control_unit
