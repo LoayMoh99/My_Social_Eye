@@ -7,22 +7,6 @@ AREA_THRESHOLD = 30
 XY_THRES = 30
 TRACKING_THRES = 0.2
 
-'''
-# Scheduling Module (Intelligent Control Unit):
-
-    This module is responsible for managing when to say the next emotion and match each speaker with his emotion.
-
-    Inputs: List<List<FaceData>> people
-            | 1st person frame1     2nd person frame1     3rd person frame1    ..
-            | 1st person frame2     2nd person frame2     3rd person frame2    ..
-            |       :                       :                      :           :
-            | 1st person frameN     2nd person frameN     3rd person frameN    ..
-
-    Outputs: (Boolean to say text need cahnge or not , Text to be said and sent to text-to-speech module)
-            i.e. (True, 'happy') or (False, 'same person')
-
-'''
-
 
 def test_cu(people, peopleNum):
     return (True, 'control unit called')
@@ -93,6 +77,21 @@ prevPeopleStatus = None
 
 
 def control_unit(people, peopleNum):
+    '''
+    #  Control Unit:
+
+        This module is responsible for managing when to say the next emotion and match each speaker with his emotion. \n
+
+        Inputs: List<List<FaceData>> people
+                | 1st person frame1     2nd person frame1     3rd person frame1    .. \n
+                | 1st person frame2     2nd person frame2     3rd person frame2    .. \n
+                |       :                       :                      :           :  \n
+                | 1st person frameN     2nd person frameN     3rd person frameN    .. \n
+
+        Outputs: (Boolean to say text need cahnge or not , Text to be said and sent to text-to-speech module) 
+                i.e. (True, 'happy') or (False, 'same person')
+
+    '''
     # TODO complete the documentation and testing!
     # testing -> test: scenarios (v.v.imp -> will take some time), try AREA_THRESHOLD , ..
 
@@ -151,7 +150,7 @@ def control_unit(people, peopleNum):
         if speakerNum == 0 and peopleNum != 0:
             if peopleStatus[0][0] == 'masked':
                 decision = (True, "masked")
-            if prevPeopleStatus != None and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
+            if prevPeopleStatus != None and prevSpeakerNum == 0 and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
                 decision = (False, "same not speaker")
             else:  # say emotion of closest one and not speaking
                 decision = (True, peopleStatus[0][1]+" but not speaking")
@@ -161,7 +160,7 @@ def control_unit(people, peopleNum):
             # and there must be a speaker (NEW) -> say his emotion
             decision = (True, peopleStatus[0][1])
         else:  # both prevSpeakerNum and speakerNum != 0 but different
-            if prevPeopleStatus != None and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
+            if prevPeopleStatus != None and prevSpeakerNum == 0 and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
                 decision = (False, "same not speaker")
             else:  # say emotion of closest one and speaking
                 decision = (True, peopleStatus[0][1])
@@ -222,6 +221,13 @@ def speaker_managment(mouthOpenNess) -> str:
     # maxMouthOpenNess = np.max(mouthOpenNess)
     # # min-max normalization
     # mouthOpenNess = (mouthOpenNess - minMouthOpenNess) / \
+    # # 2nd metric
+    # if ratio > 0.25 and ratio < 0.75:
+    #     return 'Speaker'
+    # elif ratio <= 0.25:
+    #     return 'Silent'
+    # else:  # if ratio >= 0.75:
+    #     return 'Yawn'
     #     (maxMouthOpenNess - minMouthOpenNess)
 
     diff_bet_frames = 0
@@ -239,14 +245,6 @@ def speaker_managment(mouthOpenNess) -> str:
         diff_bet_frames += abs(mouthOpenNess[i] -
                                mouthOpenNess[i-1])
     ratio = opened / N
-
-    # # 2nd metric
-    # if ratio > 0.25 and ratio < 0.75:
-    #     return 'Speaker'
-    # elif ratio <= 0.25:
-    #     return 'Silent'
-    # else:  # if ratio >= 0.75:
-    #     return 'Yawn'
 
     # check if difference between open:close frames is more than 10% no. of frames (3rd metric)
     if diff_bet_frames > np.floor(0.1 * N):
