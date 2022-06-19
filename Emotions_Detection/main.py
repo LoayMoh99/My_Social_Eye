@@ -1,5 +1,6 @@
 
 
+
 # from Assets.CommonFuntions import *
 # from Models.features import lpq, lpq_plus, LPQ, LPQPlus, PHOG_Algorithm
 from cv2 import imread
@@ -86,3 +87,4 @@ class EmotionDetectionModel:
 
 # # 3- Get LPQ feature from all faces extracted
 # LPQ_desc = lpq()
+
