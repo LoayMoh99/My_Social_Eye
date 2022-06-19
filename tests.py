@@ -1,6 +1,8 @@
-import numpy as np
+import cv2
 
-
-x = 1.0+1.0j
-x = np.array([x])
-print(np.arctan2(x.imag, np.sqrt(x.real)))
+cap = cv2.VideoCapture("http://192.168.1.4:8080/video")
+while True:
+    ret, frame = cap.read()
+    cv2.imshow('frame', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break

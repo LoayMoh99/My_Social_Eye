@@ -145,7 +145,7 @@ def control_unit(people, peopleNum):
         else:
             # say emotion of closest one and speaking i.e. either new emotion for the same speaker
             # OR there is a new speaker
-            decision = (True, peopleStatus[0][1])
+            decision = (True, "speaker is " + peopleStatus[0][1])
     else:
         if speakerNum == 0 and peopleNum != 0:
             if peopleStatus[0][0] == 'masked':
@@ -158,12 +158,12 @@ def control_unit(people, peopleNum):
             decision = (True, "No one around")
         elif prevSpeakerNum == 0:
             # and there must be a speaker (NEW) -> say his emotion
-            decision = (True, peopleStatus[0][1])
+            decision = (True, "speaker is " + peopleStatus[0][1])
         else:  # both prevSpeakerNum and speakerNum != 0 but different
             if prevPeopleStatus != None and prevSpeakerNum == 0 and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
                 decision = (False, "same not speaker")
             else:  # say emotion of closest one and speaking
-                decision = (True, peopleStatus[0][1])
+                decision = (True, "speaker is " + peopleStatus[0][1])
 
     # update prevSpeakerNum and prevPeopleStatus:
     prevPeopleStatus = peopleStatus

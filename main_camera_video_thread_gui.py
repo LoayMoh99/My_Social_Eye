@@ -98,11 +98,11 @@ numToSayNoFace = 0
 APPROVED_AREA = 50
 
 
-def main_camera_thread_gui(isCamera=False, videoName=TestDir+"sleep.mp4", silent=False, root=None, label=None, logo=None, ins=None):
+def main_camera_thread_gui(isCamera=False, camNum=0, videoName=TestDir+"sleep.mp4", silent=False, root=None, label=None, logo=None, ins=None):
     # extract frames from video / camera
     cap = None
     if isCamera:
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(camNum)
     else:
         cap = cv2.VideoCapture(videoName)
 
@@ -137,19 +137,20 @@ def main_camera_thread_gui(isCamera=False, videoName=TestDir+"sleep.mp4", silent
             results.append(decision)
             print(decision)
             if decision[0]:
-                ins.config(text='Emotion is '+decision[1])
+                ins.config(text=decision[1])
                 print("we will say the descision: " + decision[1])
                 if not silent:
                     text_to_speech(decision[1])
 
             else:
                 print("we will not say as " + decision[1])
-                ins.config(text=decision[1])
+                ins.config(text="we will not say as " + decision[1])
             root.update()
             # remove first F frames
             people = people[2*F:]
         elif numToSayNoFace == N:
             print("No faces are detected")
+            ins.config(text="No faces are detected")
             numToSayNoFace = 0
 
     while True:
