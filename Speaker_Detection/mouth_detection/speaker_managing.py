@@ -66,7 +66,7 @@ def speaker_managment(mouthOpenNess) -> str:
     # elif ratio >= 0.75:
     #     return 'Yawn'
 
-    print(diff_bet_frames, N)
+    # print(diff_bet_frames, N)
     # check if difference between open:close frames is more than 10% no. of frames (3rd metric)
     if diff_bet_frames > np.floor(0.1 * N):
         if ratio > 0.25 and ratio < 0.75:
