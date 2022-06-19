@@ -47,14 +47,27 @@ def getMouthState(frame, face):
 
 
 def getEmotion(frame, face):
-    # TODO : conjvert pred to pred_prob
-    emotions = {'happy': 0.0, 'angry': 0.0,
-                'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+    # conjvert pred to pred_prob
+    '''
+    emotionModel = EmotionDetectionModel(
+        model_file='lpq_prob.sav', is_prob=True, feats='lpq_phog')
+    emotions = emotionModel.get_labels_prob(frame, face)
+    '''
+    emotions = {'angry': 0.0, 'happy': 0.0, 'neutral': 0.0,
+                'sad': 0.0, 'surprised': 0.0}
+    # emotionModel = EmotionDetectionModel(
+    #     model_file='lpq_phog_model.sav', is_prob=True, feats='lpq_phog')
+    # emotions_arr = emotionModel.get_labels(frame, face)
+    # emotions['anger'] = emotions_arr[0]
+    # emotions['happy'] = emotions_arr[1]
+    # emotions['neutral'] = emotions_arr[2]
+    # emotions['sad'] = emotions_arr[3]
+    # emotions['surprise'] = emotions_arr[4]
     emotionModel = EmotionDetectionModel(
         model_file='lpq_phog_model_old.sav', is_prob=False, feats='lpq_phog')
     emotionStr = emotionModel.get_labels(frame, face)
-    #print('Detected Emotion:', emotionStr)
     emotions[emotionStr] = 1.0
+    print(emotions)
     global globalEmotion
     globalEmotion = emotions
     # return emotions

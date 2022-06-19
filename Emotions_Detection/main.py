@@ -33,65 +33,42 @@ class EmotionDetectionModel:
         self.is_prob = is_prob
         self.feats = feats
 
-    def get_labels_prob(self, img, frame=None):
-        if self.is_prob:
-            # Get and process Face
-            x, y, w, h = frame
-            face = img[y:y+h, x:x+w]
-            face_gray = rgb2gray(img)
-            lpq_desc = None
-            features = []
-
-            if 'lpq' in self.feats:
-                # get LPQ Feature
-                lpq_desc = self.lpq.compute(face_gray)
-
-            if 'phog' in self.feats:
-                # get PHOG Feature
-                phog_desc = PHOG_Algorithm(face_gray)
-
-            if self.feats == 'lpq_phog':
-                # concatenate the two features
-                features = np.concatenate((lpq_desc, phog_desc), axis=1)
-
-            # Predict Emotions Propabilities
-            pred = self.model.predict([features])
-
-            return pred
-        return None
-
     def get_labels(self, img, frame=None):
+
+        # Get and process Face
+        x, y, w, h = frame
+        face = img[y:y+h, x:x+w]
+        face_gray = rgb2gray(face)
+
+        # img = self.process_image(face_gray)
+        # plt.imshow(img, cmap='gray')
+        # plt.show()
+        face_gray = self.process_image(face_gray)
+        features = []
+        phog_desc = None
+
+        if 'lpq' in self.feats:
+            # get LPQ Feature
+            features = self.lpq.compute(face_gray)
+
+        if 'phog' in self.feats:
+            # get PHOG Feature
+            phog_desc = PHOG_Algorithm(face_gray)
+            features = np.concatenate((features, phog_desc))
+
+        # if self.feats == 'lpq_phog':
+        #     # concatenate the two features
+        #     features = np.concatenate((features, phog_desc))
         if not self.is_prob:
-            # Get and process Face
-            x, y, w, h = frame
-            face = img[y:y+h, x:x+w]
-            face_gray = rgb2gray(face)
-
-            # img = self.process_image(face_gray)
-            # plt.imshow(img, cmap='gray')
-            # plt.show()
-            face_gray = self.process_image(face_gray)
-            features = []
-            phog_desc = None
-
-            if 'lpq' in self.feats:
-                # get LPQ Feature
-                features = self.lpq.compute(face_gray)
-
-            if 'phog' in self.feats:
-                # get PHOG Feature
-                phog_desc = PHOG_Algorithm(face_gray)
-                features = np.concatenate((features, phog_desc))
-
-            # if self.feats == 'lpq_phog':
-            #     # concatenate the two features
-            #     features = np.concatenate((features, phog_desc))
-
             # Predict Emotions String
             pred = self.model.predict([features])
 
             return pred[0]
-        return None
+        else:
+            # Predict Emotions Propabilities
+            pred = self.model.predict_proba([features])
+
+            return pred[0]
 
     def process_image(self, img):
         img = ((img)*255).astype('uint8')
