@@ -100,11 +100,10 @@ def activateMeetingAnalytics(event):
     welcomeMeeting()
     # change the text to tell that
     ins.config(text="Activated Meeting Analysis mode to stop press q button")
-    # minimize the root
-    root.wm_state('iconic')
-    root.iconify()
-    # TODO Put the code you want to run here for meeting analysis (screen recording)
-    main_record_thread()
+    # # minimize the root
+    # root.wm_state('iconic')
+    # root.iconify()
+    main_record_thread(ins,root)
 
 
 # open camera option

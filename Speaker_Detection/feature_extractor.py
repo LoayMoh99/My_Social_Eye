@@ -1,9 +1,13 @@
 
 import numpy as np
 import dlib
+import os 
 
+# get curr dir
+dir = os.getcwd()
+print(dir)
 # load the dlib feature extractor:
-predictor_path = "C:/Collage/GP/My_Social_Eye/Speaker_Detection/face_landmarks/shape_predictor_68_face_landmarks.dat"
+predictor_path = dir+"/face_landmarks/shape_predictor_68_face_landmarks.dat"
 predictor = dlib.shape_predictor(predictor_path)
 
 

@@ -67,7 +67,6 @@ def getEmotion(frame, face):
         model_file='lpq_phog_model_old.sav', is_prob=False, feats='lpq_phog')
     emotionStr = emotionModel.get_labels(frame, face)
     emotions[emotionStr] = 1.0
-    print(emotions)
     global globalEmotion
     globalEmotion = emotions
     # return emotions
@@ -120,7 +119,7 @@ def main_camera_thread_gui(isCamera=False, camNum=0, videoName=TestDir+"sleep.mp
         cap = cv2.VideoCapture(videoName)
 
     results = []
-    F = 10  # frames per second
+    F = 4  # frames per second
     S = 5  # seconds
     N = S * F  # number of frames
 
@@ -148,19 +147,19 @@ def main_camera_thread_gui(isCamera=False, camNum=0, videoName=TestDir+"sleep.mp
             #decision = test_cu(people, peopleNum)
             decision = control_unit(people, peopleNum)
             results.append(decision)
-            print(decision)
+
             if decision[0]:
                 ins.config(text=decision[1])
-                print("we will say the descision: " + decision[1])
+                print("We will say the descision: " + decision[1])
                 if not silent:
                     text_to_speech(decision[1])
 
             else:
-                print("we will not say as " + decision[1])
-                ins.config(text="we will not say as " + decision[1])
-            root.update()
+                print("We will NOT say as " + decision[1])
+                ins.config(text="We will NOT say as " + decision[1])
             # remove first F frames
-            people = people[2*F:]
+            people = []  # people[2*F:]
+
         elif numToSayNoFace == N:
             print("No faces are detected")
             ins.config(text="No faces are detected")

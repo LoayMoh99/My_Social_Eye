@@ -96,13 +96,13 @@ numToSayNoFace = 0
 APPROVED_AREA = 50
 
 
-def main_record_thread():
+def main_record_thread(ins, root):
     # extract frames from screenshot
     img = pyautogui.screenshot()
     # convert these pixels to a proper numpy array to work with OpenCV
     frame = np.array(img)
 
-    F = 10  # frames per second
+    F = 4  # frames per second
     S = 5  # seconds
     N = S * F  # number of frames
 
@@ -129,17 +129,20 @@ def main_record_thread():
             # call control unit
             #decision = test_cu(people, peopleNum)
             decision = control_unit(people, peopleNum)
-            print(decision)
             if decision[0]:
-                print("we will say the descision: " + decision[1])
+                ins.config(text=decision[1])
+                print("We will say the descision: " + decision[1])
                 text_to_speech(decision[1])
             else:
-                print("we will not say as " + decision[1])
+                print("We will NOT say as " + decision[1])
+                ins.config(text="We will NOT say as " + decision[1])
             # remove first F frames
-            people = people[2*F:]
+            people = []  # people[2*F:]
         elif numToSayNoFace == N:
             print("No faces are detected")
+            ins.config(text="No faces are detected")
             numToSayNoFace = 0
+        root.update()
     while True:
         # each model preprocess the frame as needed
 

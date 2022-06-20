@@ -64,7 +64,7 @@ def samePerson(person, prevPerson):
     # check if the face_tracking_feature didn't change much
     tracking_feat = np.linalg.norm(
         person[5]-prevPerson[5])*2 / (np.linalg.norm(person[5])+np.linalg.norm(prevPerson[5]))
-    print('tracking_feat', tracking_feat)
+
     return (np.abs(person[4][0] - prevPerson[4][0]) < XY_THRES and
             np.abs(person[4][1] - prevPerson[4][1]) < XY_THRES and
             np.abs(person[3] - prevPerson[3]) < AREA_THRESHOLD and
@@ -137,33 +137,36 @@ def control_unit(people, peopleNum):
             peopleStatus, key=lambda x: x[2], reverse=True)
 
     decision = None
-    print('speakerNum , peopleNum: ', speakerNum, peopleNum)
+    print('Speaker Number = ', speakerNum)
+    print('People Number = ', peopleNum)
     # check if text needed to be changed:
     if prevSpeakerNum == speakerNum and speakerNum != 0:
         if prevPeopleStatus != None and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
-            decision = (False, "same speaker")
+            decision = (False, "Same Speaker with Same Emotion")
         else:
             # say emotion of closest one and speaking i.e. either new emotion for the same speaker
             # OR there is a new speaker
-            decision = (True, "speaker is " + peopleStatus[0][1])
+            decision = (True, peopleStatus[0][1]+" and Speaking")
     else:
         if speakerNum == 0 and peopleNum != 0:
             if peopleStatus[0][0] == 'masked':
                 decision = (True, "masked")
             if prevPeopleStatus != None and prevSpeakerNum == 0 and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
-                decision = (False, "same not speaker")
+                decision = (
+                    False, "Same Person 'Not Speaking' with Same Emotion")
             else:  # say emotion of closest one and not speaking
                 decision = (True, peopleStatus[0][1]+" but not speaking")
         elif speakerNum == 0 and peopleNum == 0:
             decision = (True, "No one around")
         elif prevSpeakerNum == 0:
             # and there must be a speaker (NEW) -> say his emotion
-            decision = (True, "speaker is " + peopleStatus[0][1])
+            decision = (True, peopleStatus[0][1]+" and Speaking")
         else:  # both prevSpeakerNum and speakerNum != 0 but different
             if prevPeopleStatus != None and prevSpeakerNum == 0 and samePerson(prevPeopleStatus[0], peopleStatus[0]) and prevPeopleStatus[0][1] == peopleStatus[0][1]:
-                decision = (False, "same not speaker")
+                decision = (
+                    False, "Same Person 'Not Speaking' with Same Emotion")
             else:  # say emotion of closest one and speaking
-                decision = (True, "speaker is " + peopleStatus[0][1])
+                decision = (True, peopleStatus[0][1]+" and Speaking")
 
     # update prevSpeakerNum and prevPeopleStatus:
     prevPeopleStatus = peopleStatus
