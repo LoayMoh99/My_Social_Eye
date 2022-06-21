@@ -24,9 +24,7 @@ def read_and_process(img_path):
     # Read and convert to Gray
     img = io.imread(img_path, as_gray=True) * 255
     img = img.astype('uint8')
-    # Resize ?
-    # Crop ?
-    
+    # img = img[12:, :]
     return img
 
 def read_data(dir: str):
@@ -36,8 +34,9 @@ def read_data(dir: str):
     for folder in folders:
         folder_path = os.path.join(dir, folder)
         imgs = os.listdir(folder_path)
-        for img in imgs:
-            x_images.append(io.imread(os.path.join(folder_path, img), as_gray=True))
+        print(folder, len(imgs))
+        for i in range(len(imgs)):
+            x_images.append(read_and_process(os.path.join(folder_path, f'im{i}.png')))
             y_images.append(folder)
     return x_images, y_images
 
