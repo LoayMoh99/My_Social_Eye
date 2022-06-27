@@ -11,6 +11,7 @@ More Description of the project could be found here at this youtube video:
 Pre-requesities (Install Requirements):
 
 Have Python installed (preferred python > 2.7)
+
 Then install requirements:
 ```
    python -m pip install --upgrade pip
