@@ -47,7 +47,7 @@ class TestControlUnit(unittest.TestCase):
         # Detect speaker and happy
         res = cu.control_unit(people=self.people, peopleNum=self.peopleNum)
         print(res)
-        self.assertEqual(res, (True, 'speaker is happy'))
+        self.assertEqual(res, (True, 'happy and Speaking'))
 
         ###################################################################################
         # Detect that same speaker with same emotion -> Not saying anything
@@ -75,7 +75,7 @@ class TestControlUnit(unittest.TestCase):
 
         res = cu.control_unit(people=people, peopleNum=self.peopleNum)
         print(res)
-        self.assertEqual(res, (False, 'same speaker'))
+        self.assertEqual(res, (False, 'Same Speaker with Same Emotion'))
 
         ###################################################################################
         # Detect that same speaker but with diff emotion -> say new emotion
@@ -104,7 +104,7 @@ class TestControlUnit(unittest.TestCase):
 
         res = cu.control_unit(people=people, peopleNum=self.peopleNum)
         print(res)
-        self.assertEqual(res, (True, 'speaker is sad'))
+        self.assertEqual(res, (True, 'sad and Speaking'))
 
     def test_cu2(self):
         ###################################################################################
@@ -136,7 +136,7 @@ class TestControlUnit(unittest.TestCase):
         # Detect that same speaker but with diff emotion -> say new emotion
         res = cu.control_unit(people=people, peopleNum=self.peopleNum)
         print(res)
-        self.assertEqual(res, (True, 'speaker is sad'))
+        self.assertEqual(res, (True, 'sad and Speaking'))
 
 
 if __name__ == '__main__':
