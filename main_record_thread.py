@@ -49,7 +49,7 @@ def getEmotion(frame, face):
     emotions = {'happy': 0.0, 'angry': 0.0,
                 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
     emotionModel = EmotionDetectionModel(
-        model_file='lpq_phog_model_old.sav', is_prob=False, feats='lpq_phog')
+        model_file='Models/lpq_phogV3_3.sav', is_prob=False, feats='lpq_phog')
     emotionStr = emotionModel.get_labels(frame, face)
     #print('Detected Emotion:', emotionStr)
     emotions[emotionStr] = 1.0

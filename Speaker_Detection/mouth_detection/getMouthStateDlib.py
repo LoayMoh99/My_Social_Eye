@@ -7,13 +7,13 @@ import os
 # get curr dir
 dir = os.getcwd()
 # load the dlib feature extractor:
-predictor_path = dir+"/../face_landmarks/shape_predictor_68_face_landmarks.dat"
+predictor_path = os.path.join(dir, 'Speaker_Detection/face_landmarks/shape_predictor_68_face_landmarks.dat')
 
 # load the dlib feature extractor:
 predictor = dlib.shape_predictor(predictor_path)
 
 # load our mouth open-ness detector model:
-filename = 'C:\Collage\GP\My_Social_Eye\Speaker_Detection\mouth_detection\dlib_model.sav'
+filename = os.path.join(dir, 'Speaker_Detection\mouth_detection\dlib_model.sav')
 mouthDetectorModel = pickle.load(open(filename, 'rb'))
 
 

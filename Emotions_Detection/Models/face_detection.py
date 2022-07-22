@@ -4,8 +4,9 @@ import skimage.io as io
 import os
 
 FRAME_COLOR = (255, 0, 0)
-face_classifier = cv2.CascadeClassifier(
-    'C:\Collage\GP\My_Social_Eye\Emotions_Detection\Assets\haarcascade_frontalface_default.xml')
+dir = os.getcwd()
+file_path = os.path.join(dir, 'Emotions_Detection\Assets\haarcascade_frontalface_default.xml')
+face_classifier = cv2.CascadeClassifier(file_path)
 
 
 def get_faces_from_image(image, color=FRAME_COLOR, is_dir=True, is_gray=True):
