@@ -7,6 +7,4 @@ Managment_Module/__pycache__/
 Emotions_Detection/Models/__pycache__/
 Speaker_Detection/mouth_detection/__pycache__/
 Interface/my_social_eye/pubspec.lock
-Emotions_Detection/lpq_phog_model.sav
-Emotions_Detection/lpq_phog_model_old.sav
-Emotions_Detection/lpq.sav
+Emotions_Detection/*.sav

@@ -8,7 +8,18 @@ More Description of the project could be found here at this youtube video:
 [My Social Eye!](https://youtu.be/uam2H85lXko)
 
 ## To run theapp:
+Pre-requesities (Install Requirements):
 
+Have Python installed (preferred python > 2.7)
+
+Then install requirements:
+```
+   python -m pip install --upgrade pip
+   pip install numpy
+   pip install tensorflow
+   pip install -U scikit-image
+   python -m pip install -r requirements.txt
+```
 1. From Terminal:
 
     ```python
