@@ -3,7 +3,7 @@ import threading
 import pyttsx3
 from Speaker_Detection.mouth_detection.getMouthStateDlib import getMouthStateDlib
 from Emotions_Detection.Models.face_detection import get_faces_from_image
-from Emotions_Detection.main import EmotionDetectionModel
+from Emotions_Detection.main import EmotionsDetectionModel
 from Managment_Module.face_tracking_feature import extractFaceTrackFeature
 from Managment_Module.control_unit import control_unit
 from Managment_Module.control_unit import test_cu
@@ -34,6 +34,8 @@ TestDir = "C:\\Collage\\GP\\test\\"
 globalEmotion = None
 globalMouthState = None
 globalFaceTrack = None
+emotion_model = None
+
 
 
 def maskDetector(frame, face):
@@ -48,24 +50,10 @@ def getMouthState(frame, face):
 
 def getEmotion(frame, face):
     # conjvert pred to pred_prob
-    '''
-    emotionModel = EmotionDetectionModel(
-        model_file='lpq_prob.sav', is_prob=True, feats='lpq_phog')
-    emotions = emotionModel.get_labels_prob(frame, face)
-    '''
-    emotions = {'angry': 0.0, 'happy': 0.0, 'neutral': 0.0,
-                'sad': 0.0, 'surprised': 0.0}
-    # emotionModel = EmotionDetectionModel(
-    #     model_file='lpq_phog_model.sav', is_prob=True, feats='lpq_phog')
-    # emotions_arr = emotionModel.get_labels(frame, face)
-    # emotions['anger'] = emotions_arr[0]
-    # emotions['happy'] = emotions_arr[1]
-    # emotions['neutral'] = emotions_arr[2]
-    # emotions['sad'] = emotions_arr[3]
-    # emotions['surprise'] = emotions_arr[4]
-    emotionModel = EmotionDetectionModel(
-        model_file='lpq_phog_model_old.sav', is_prob=False, feats='lpq_phog')
-    emotionStr = emotionModel.get_labels(frame, face)
+    emotions = {'Happy': 0.0, 'Neutral': 0.0,
+                'Unpleased': 0.0, 'Surprised': 0.0, 'Disgust':0.0}
+    
+    emotionStr = emotion_model.predict_image(frame, face)
     emotions[emotionStr] = 1.0
     global globalEmotion
     globalEmotion = emotions
@@ -122,6 +110,8 @@ def main_camera_thread_gui(isCamera=False, camNum=0, videoName=TestDir+"sleep.mp
     F = 4  # frames per second
     S = 5  # seconds
     N = S * F  # number of frames
+    global emotion_model
+    emotion_model = EmotionsDetectionModel(verbose=False)
 
     def addToPeople(faceDataList):
         global people

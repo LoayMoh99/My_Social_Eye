@@ -1,90 +1,49 @@
-
-
-
-# from Assets.CommonFuntions import *
-# from Models.features import lpq, lpq_plus, LPQ, LPQPlus, PHOG_Algorithm
-from cv2 import imread
-import sklearn
-import cv2
-import skimage.io as io
-from skimage.color import rgb2gray
-from sklearn.svm import SVC
-import pickle
-import numpy as np
-import matplotlib.pyplot as plt
-import sys
 import os
+import numpy as np
+import cv2
 
-from Emotions_Detection.features import LPQ, PHOG_Algorithm
+from keras import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
 
-current = os.path.dirname(os.path.realpath(os.getcwd()))
-parent = os.path.dirname(current)
-sys.path.append(parent)
+class EmotionsDetectionModel:
+    def __init__(self, verbose: bool=False) -> None:
+        self.verbose = verbose
+        self.model = self._create_model()
+        weight_path = os.path.join(os.getcwd(), 'Emotions_Detection/Models/model_pretrained.h5')
+        self.model.load_weights(weight_path)
+        self.emotions = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
 
+    def predict_image(self, frame: np.array, rect=None) -> str:
+        '''Receives an image of any size with 2 or 3 color channels max'''
+        # 1- Preprocess the Image
+        x, y, w, h = rect
+        face = frame[y:y+h,x:x+w]
+        # Convert Image to Gray
+        face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY) if len(face.shape) >= 3 else face
+        face = np.expand_dims(np.expand_dims(cv2.resize(face, (48, 48)), -1), 0)
 
-# 1- Read the Image(s)
+        # Recognize the Emotion -> Predict
+        pred = self.model.predict([face], verbose=self.verbose)
+        emotion = self.emotions[np.argmax(pred)]
+        return emotion if emotion not in ['Sad', 'Angry', 'Fearful'] else 'Unpleased'
 
+    def _create_model(self) -> Sequential:
+        model = Sequential()
+        model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
+        model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Dropout(0.25))
 
-class EmotionDetectionModel:
-    def __init__(self, model_file='lpq_phog_model.sav', feats='lpq_phog', is_prob=True) -> None:
-        self.lpq = LPQ()
-        file_path = os.path.join(os.getcwd(), 'Emotions_detection')
-        file_path = os.path.join(file_path, model_file)
-        self.model = pickle.load(open(file_path, 'rb'))
-        self.is_prob = is_prob
-        self.feats = feats
+        model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    def get_labels(self, img, frame=None):
+        model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Dropout(0.25))
+        
+        model.add(Flatten())
+        model.add(Dense(1024, activation='relu'))
+        model.add(Dropout(0.5))
+        model.add(Dense(7, activation='softmax'))
 
-        # Get and process Face
-        x, y, w, h = frame
-        face = img[y:y+h, x:x+w]
-        face_gray = rgb2gray(face)
-
-        # img = self.process_image(face_gray)
-        # plt.imshow(img, cmap='gray')
-        # plt.show()
-        face_gray = self.process_image(face_gray)
-        features = []
-        phog_desc = None
-
-        if 'lpq' in self.feats:
-            # get LPQ Feature
-            features = self.lpq.compute(face_gray)
-
-        if 'phog' in self.feats:
-            # get PHOG Feature
-            phog_desc = PHOG_Algorithm(face_gray)
-            features = np.concatenate((features, phog_desc))
-
-        # if self.feats == 'lpq_phog':
-        #     # concatenate the two features
-        #     features = np.concatenate((features, phog_desc))
-        if not self.is_prob:
-            # Predict Emotions String
-            pred = self.model.predict([features])
-
-            return pred[0]
-        else:
-            # Predict Emotions Propabilities
-            pred = self.model.predict_proba([features])
-
-            return pred[0]
-
-    def process_image(self, img):
-        img = ((img)*255).astype('uint8')
-        if len(img.shape) > 2:
-            img = rgb2gray(img)
-        img = cv2.resize(img, (48, 48), interpolation=cv2.INTER_NEAREST)
-        return img
-
-
-# # 2- Extract Faces from image
-# faces = get_faces_from_image(img, is_dir=False)
-# x, y, w, h = faces[0]
-# roi = img[y:y+h, x:x+w]
-
-
-# # 3- Get LPQ feature from all faces extracted
-# LPQ_desc = lpq()
-
+        return model
