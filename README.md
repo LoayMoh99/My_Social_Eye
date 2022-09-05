@@ -5,7 +5,7 @@
 A Software Program to help the blind and VI to determine others’ emotional and mood changes, etc all in real-time.
 
 More Description of the project could be found here at this youtube video:
-[My Social Eye!](https://youtu.be/uam2H85lXko)
+[My Social Eye!](https://www.youtube.com/watch?v=VOWPpb8mlBA)
 
 ## To run theapp:
 Pre-requesities (Install Requirements):
